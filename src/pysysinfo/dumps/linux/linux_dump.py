@@ -89,3 +89,16 @@ class LinuxHardwareManager:
         self.info.cpu.status = PartialStatus()
 
         # todo: get CPU codename from CodenameManager
+
+
+    def fetch_memory_info(self):
+        if not os.path.isdir("/sys/firmware/dmi/entries"):
+            self.info.memory.status = FailedStatus()
+            return
+
+        # Memory DMI entries are of type 5,6,16, or 17
+        # https://linux.die.net/man/8/dmidecode
+        dmi_entries = os.scandir("/sys/firmware/dmi/entries")
+        memory_dmi_types = ("5-", "6-", "16-", "17-")
+        memory_dmi_entries = [p for p in dmi_entries if p.path.split("/")[-1].startswith(memory_dmi_types)]
+
