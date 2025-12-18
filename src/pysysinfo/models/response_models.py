@@ -2,15 +2,7 @@ from typing import List
 
 from pydantic import BaseModel
 
-from src.pysysinfo.models.success_models import FailedStatus, StatusModel, SuccessStatus
-
-
-class HardwareInfo(BaseModel):
-    cpu: CPUInfo
-    memory: MemoryInfo
-
-class LinuxHardwareInfo(HardwareInfo):
-    pass
+from src.pysysinfo.models.success_models import StatusModel, SuccessStatus
 
 class ComponentInfo(BaseModel):
     status: StatusModel = SuccessStatus()
@@ -23,4 +15,12 @@ class CPUInfo(ComponentInfo):
     threads: int = -1
 
 class MemoryInfo(ComponentInfo):
+    pass
+
+
+class HardwareInfo(BaseModel):
+    cpu: CPUInfo
+    memory: MemoryInfo
+
+class LinuxHardwareInfo(HardwareInfo):
     pass
