@@ -30,14 +30,12 @@ class LinuxHardwareManager:
 
         try:
             raw_cpu_info = open('/proc/cpuinfo').read()
-            # raw_cpu_info = open("cpuinfo.txt", "r").read()
         except Exception as e:
             # todo: handle error using logger, dont interrupt execution
             self.info.cpu.status = FailedStatus()
             raise e
 
         architecture = subprocess.run(['uname', '-m'], capture_output=True, text=True)
-        # architecture = subprocess.run(['echo', 'x86_64'], capture_output=True, text=True)
 
         if not raw_cpu_info:
             self.info.cpu.status = FailedStatus()
