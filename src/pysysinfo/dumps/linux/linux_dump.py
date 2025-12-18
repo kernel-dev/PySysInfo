@@ -25,6 +25,9 @@ class LinuxHardwareManager:
         )
 
     def fetch_cpu_info(self):
+
+        # todo: Check if any of the regexes may suffer from string having two `\t`s
+
         try:
             raw_cpu_info = open('/proc/cpuinfo').read()
             # raw_cpu_info = open("cpuinfo.txt", "r").read()
@@ -138,7 +141,7 @@ class LinuxHardwareManager:
         - https://linux.die.net/man/8/dmidecode
         """
         # DMI entries relating to memory are of type 5,6,16, or 17
-        # Memory _Module_ entries are of type 17
+        # Memory _Module_ entries are of type 17, this is what we want to iterate over
 
         dmi_entries = os.scandir("/sys/firmware/dmi/entries")
         memory_dmi_types = "17-"
