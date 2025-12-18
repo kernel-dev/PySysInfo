@@ -64,9 +64,7 @@ class LinuxHardwareManager:
             # nothing more can be retrieved from /proc/cpuinfo for ARM
             return
 
-        else:
-            # todo: check if this inference is valid
-            self.info.cpu.architecture = "x86_64"
+        self.info.cpu.architecture = "x86_64"
 
 
         cpu_info = [x for x in raw_cpu_info.split("\n\n") if x.strip("\n")]
