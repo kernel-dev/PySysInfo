@@ -44,9 +44,8 @@ def fetch_memory_info():
         for entry in array:
             if entry["IORegistryEntryName"] != "memory":
                 continue
-            # This is the dictionary entry we want to parse
-            # print(entry)
 
+            # This is the dictionary entry we want to parse
             for k, v in entry.items():
                 """
                 Actual Key names:
@@ -107,14 +106,14 @@ def fetch_memory_info():
                     # print(v)
                     dimm_slots = [x.decode().split("/") for x in v.split(b'\x00') if x.decode().strip()]
 
-    print("Manufacturers:", dimm_manufacturer)
-    print("Part Numbers:", dimm_part_numbers)
-    print("Serial Numbers:", dimm_serial_number)
-    print("Speeds:", dimm_speeds)
-    print("Capacities:", dimm_sizes)
-    print("Types:", dimm_types)
-    print("ECC Enabled:", ecc_enabled)
-    print("Slot Names:", dimm_slots)
+    # print("Manufacturers:", dimm_manufacturer)
+    # print("Part Numbers:", dimm_part_numbers)
+    # print("Serial Numbers:", dimm_serial_number)
+    # print("Speeds:", dimm_speeds)
+    # print("Capacities:", dimm_sizes)
+    # print("Types:", dimm_types)
+    # print("ECC Enabled:", ecc_enabled)
+    # print("Slot Names:", dimm_slots)
 
     n_modules = max([len(dimm_manufacturer), len(dimm_part_numbers), len(dimm_serial_number),
                      len(dimm_speeds), len(dimm_types), len(dimm_slots)])
