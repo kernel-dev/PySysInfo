@@ -24,6 +24,11 @@ def fetch_memory_info():
         memory_info.status = FailedStatus()
         return memory_info
 
+    """
+    We get the output of ioreg as a Plist, and parse it using Python's Plist library.
+    `-alw0` forces a Plist output
+    `-p` is used to traverse registry over the IODeviceTree plane (IOService is default)
+    """
     output = subprocess.check_output(["ioreg", "-alw0", "-p", "IODeviceTree"])
     # output = subprocess.check_output(["cat", "/Users/mahas/Downloads/tree.txt"])
     pl = plistlib.loads(output, fmt=plistlib.FMT_XML)
@@ -63,7 +68,7 @@ def fetch_memory_info():
                 Since we have to accumulate all properties in their own arrays anyway,
                 and make the MemoryModuleInfo afterwards, there is no downsides to iterating through all keys.
                 """
-
+                # we have to exactly match reg, because it can incorrectly match keys like IORegXYZ
                 if k.lower() == "reg":
                     """
                     This key contains the capacity of the RAM module.
