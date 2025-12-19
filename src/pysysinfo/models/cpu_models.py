@@ -6,6 +6,7 @@ from src.pysysinfo.models.component_model import ComponentInfo
 class CPUInfo(ComponentInfo):
     model_name: str = ""
     architecture: str = ""
+    bitness: Optional[int] = None
     version: Optional[str] = None
     vendor: Optional[str] = None
     flags: List[str] = []
