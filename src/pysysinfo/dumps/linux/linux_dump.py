@@ -176,6 +176,9 @@ class LinuxHardwareManager:
 
     def fetch_storage_info(self):
         # Storage Block Information is in /sys/block
+        # todo: if /sys/subsystem exists, do not parse /sys/block
+        # https://www.kernel.org/doc/html/latest/admin-guide/sysfs-rules.html#:~:text=Classification%20by%20subsystem
+
         if not os.path.isdir("/sys/block"):
             self.info.disk.status = FailedStatus()
             return
