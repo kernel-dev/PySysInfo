@@ -27,7 +27,7 @@ class LinuxHardwareManager:
         )
 
     def fetch_cpu_info(self):
-        return fetch_cpu_info()
+        self.info.cpu = fetch_cpu_info()
 
     def fetch_memory_info(self):
         if not os.path.isdir("/sys/firmware/dmi/entries"):

@@ -123,7 +123,6 @@ def fetch_cpu_info() -> CPUInfo:
 
     architecture = subprocess.run(['uname', '-m'], capture_output=True, text=True)
 
-
     if ("aarch64" in architecture.stdout) or ("arm" in architecture.stdout):
         return fetch_arm_cpu_info(raw_cpu_info)
 
