@@ -4,9 +4,9 @@ from src.pysysinfo.dumps.mac.mac_dump import MacHardwareManager
 
 lhm = MacHardwareManager()
 
-lhm.fetch_cpu_info()
+# lhm.fetch_cpu_info()
 lhm.fetch_memory_info()
-lhm.fetch_storage_info()
+# lhm.fetch_storage_info()
 
 json_data = json.loads(lhm.info.model_dump_json())
 
