@@ -9,6 +9,6 @@ class CPUInfo(ComponentInfo):
     bitness: Optional[int] = None
     version: Optional[str] = None
     vendor: Optional[str] = None
-    flags: List[str] = []
+    sse_flags: List[str] = []
     cores: Optional[int] = None
     threads: int = -1
