@@ -334,7 +334,7 @@ class LinuxHardwareManager:
                 disk.size = Gigabyte(capacity=(size_in_bytes / 1024**3))
 
             except Exception as e:
-                self.info.disk.status = PartialStatus()
+                self.info.storage.status = PartialStatus()
                 # todo: Log this properly
 
             self.info.storage.disks.append(disk)
