@@ -39,19 +39,28 @@ def fetch_storage_info() -> StorageInfo:
 
             # Name of the storage device.
             name = product.get("Product Name")
+            if name: name = name.strip()
 
             # Name of vendor
             vendor = product.get("Vendor Name")
-            if not vendor and "apple" in name.lower():
+
+            if vendor: vendor = vendor.strip()
+            elif "apple" in name.lower():
                 vendor = "Apple"
 
             # Type of storage device (SSD, HDD, etc.)
             _type = product.get("Medium Type")
-            if not _type: _type = "Unknown"
+            if _type:
+                _type = _type.strip()
+            else:
+                _type = "Unknown"
 
             # Type of connector (SATA, USB, SCSI, etc.)
             ct_type = protocol.get("Physical Interconnect")
-            if not ct_type: ct_type = "Unknown"
+            if ct_type:
+                ct_type = ct_type.strip()
+            else:
+                ct_type = "Unknown"
 
             # Whether this device is internal or external.
             location = protocol.get("Physical Interconnect Location", "")
