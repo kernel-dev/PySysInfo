@@ -54,8 +54,11 @@ def fetch_storage_info() -> StorageInfo:
             if not ct_type: ct_type = "Unknown"
 
             # Whether this device is internal or external.
-            location = protocol.get("Physical Interconnect Location").strip()
-            if not location: location = "Unknown"
+            location = protocol.get("Physical Interconnect Location")
+            if location:
+                location = location.strip()
+            else:
+                location: location = "Unknown"
 
             if ct_type.lower() == "pci-express":
                 _type = "Non-Volatile Memory Express (NVMe)"
