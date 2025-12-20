@@ -8,13 +8,6 @@ from src.pysysinfo.models.status_models import PartialStatus
 import winreg
 import os
 
-"""
-Thanks to workhorsy and flababah for their implementations, on which my implementation is based.
-References: 
-- https://github.com/flababah/cpuid.py
-- https://github.com/workhorsy/py-cpuinfo/blob/master/cpuinfo/cpuinfo.py
-"""
-
 kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
 kernel32.IsProcessorFeaturePresent.argtypes = [wintypes.DWORD]
 kernel32.IsProcessorFeaturePresent.restype = wintypes.BOOL
@@ -32,10 +25,10 @@ def get_arm_version() -> str:
     """
     We use instructions that were introduced in different ARM versions to determine the ARM version.
     
-    ARMv9
+    Introduced in ARMv9:
     - SVE2 - FEAT_SSVE_FP8DOT2 (78), FEAT_SSVE_FP8DOT4 (79), and FEAT_SSVE_FP8FMA (80)
     
-    ARMv8
+    Introduced in ARMv8:
     - Full AArch64 Instructions - FEAT_SME_FA64 (88)
     
     Otherwise

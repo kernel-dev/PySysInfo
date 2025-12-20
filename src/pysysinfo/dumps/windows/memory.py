@@ -8,7 +8,7 @@ from typing import List
 
 """
 the WMIC command-line utility is deprecated, and is replaced by PowerShell cmdlets.
-However, it is faster than instantiating a WMI instance, so if this is available, we prefer this.
+We first check if the WMIC command works, and if it fails, we fallback to the PowerShell cmdlet.
 """
 def fetch_wmic_memory_info() -> MemoryInfo:
     memory_info = MemoryInfo()
@@ -18,7 +18,7 @@ def fetch_wmic_memory_info() -> MemoryInfo:
     except Exception as e:
         """
         This means the WMIC command failed - possibly because it is not available on this system.
-        We mark the status as failed and return an empty MemoryInfo object, so that we can fallback to the python WMI library.
+        We mark the status as failed and return an empty MemoryInfo object, so that we can fallback to the PowerShell cmdlet.
         """
         memory_info.status = FailedStatus()
         return memory_info
