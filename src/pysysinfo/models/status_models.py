@@ -12,12 +12,28 @@ class SuccessStatus(StatusModel):
     messages: List[str] = []
 
 class PartialStatus(StatusModel):
+    """
+    Class to denote a Partially failed discovery of a particular component.
+    """
     string: str = "partial"
     messages: List[str] = []
 
 class FailedStatus(StatusModel):
+    """
+    Class to denote a the complete failure of discovery for a particular component.
+    A Failed state can be logged like so:
+    ```
+    cpu_info.status = FailedStatus("Failed to open /proc/cpuinfo")
+    ```
+    """
     string: str = "failed"
     messages: List[str] = []
+
+    def __init__(self, message: Optional[str]=None):
+        super().__init__()
+        if message:
+            self.messages = [message]
+
 
 """
 The intention of `messages` being List[str] is that PartialStatus can benefit from containing many messages.

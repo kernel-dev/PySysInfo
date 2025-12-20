@@ -119,12 +119,12 @@ def fetch_cpu_info() -> CPUInfo:
         raw_cpu_info = open('/proc/cpuinfo').read()
     except Exception as e:
         # todo: handle error using logger, dont interrupt execution
-        cpu_info.status = FailedStatus(messages=["Could not open /proc/cpuinfo"])
+        cpu_info.status = FailedStatus("Could not open /proc/cpuinfo")
         # raise e
         return cpu_info
 
     if not raw_cpu_info:
-        cpu_info.status = FailedStatus(messages=["/proc/cpuinfo has no content"])
+        cpu_info.status = FailedStatus("/proc/cpuinfo has no content")
         return cpu_info
 
     architecture = subprocess.run(['uname', '-m'], capture_output=True, text=True)

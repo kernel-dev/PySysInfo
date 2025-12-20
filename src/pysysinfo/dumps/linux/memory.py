@@ -11,7 +11,7 @@ def fetch_memory_info() -> MemoryInfo:
     memory_info = MemoryInfo()
 
     if not os.path.isdir("/sys/firmware/dmi/entries"):
-        memory_info.status = FailedStatus()
+        memory_info.status = FailedStatus("The /sys/firmware/dmi/entries directory doesn't exist")
         return memory_info
 
     """
@@ -55,12 +55,12 @@ def fetch_memory_info() -> MemoryInfo:
                 module.part_number = part_no
         except subprocess.CalledProcessError as e:
             # todo: Need SUDO for this. Mention this in the Log
-            memory_info.status = FailedStatus()
+            memory_info.status = FailedStatus("Unable to open /sys/firmware/dmi/entries. Are you root?")
             return memory_info
 
         except Exception as e:
-            memory_info.status = PartialStatus()
-            # todo: Log the error appropriately
+            memory_info.status = PartialStatus(messages=memory_info.status.messages)
+            memory_info.status.messages.append("Reading DMI Entries: " + str(e))
             continue
 
         # Redefining here in case somehow it gets referenced before assignment
@@ -72,8 +72,8 @@ def fetch_memory_info() -> MemoryInfo:
             # DIMM type value is stored at offset 12h
             module.type = MEMORY_TYPE[value[0x12]]
         except Exception as e:
-            # todo: Log appropriately
-            memory_info.status = PartialStatus()
+            memory_info.status = PartialStatus(messages=memory_info.status.messages)
+            memory_info.status.messages.append("DIMM Type: " + str(e))
             continue
 
         # Attempt to obtain DIMM Location
@@ -83,17 +83,17 @@ def fetch_memory_info() -> MemoryInfo:
                 bank=get_string_entry(strings, value[0x11])
             )
         except Exception as e:
-            memory_info.status = PartialStatus()
+            memory_info.status = PartialStatus(messages=memory_info.status.messages)
+            memory_info.status.messages.append("DIMM Location: " + str(e))
             continue
-            # todo: Log appropriately
 
         # Attempt to obtain manufacturer
         try:
             module.manufacturer = get_string_entry(strings, value[0x17])
         except Exception as e:
-            memory_info.status = PartialStatus()
+            memory_info.status = PartialStatus(messages=memory_info.status.messages)
+            memory_info.status.messages.append("DIMM Manufacturer: " + str(e))
             continue
-            # todo: Log this appropriately
 
         # Attempt to obtain capacity
 
@@ -130,7 +130,8 @@ def fetch_memory_info() -> MemoryInfo:
             size = int.from_bytes(value[0x0C:0x0E], "little")
             if size == 0xFFFF:
                 # Unknown size
-                memory_info.status = PartialStatus()
+                memory_info.status = PartialStatus(messages=memory_info.status.messages)
+                memory_info.status.messages.append("Unknown DIMM Size")
                 continue
 
             if size == 0x7FFF:
@@ -150,9 +151,9 @@ def fetch_memory_info() -> MemoryInfo:
 
         except Exception as e:
             print(e)
-            memory_info.status = PartialStatus()
+            memory_info.status = PartialStatus(messages=memory_info.status.messages)
+            memory_info.status.messages.append("DIMM Capacity: " + str(e))
             continue
-            # todo: Log this appropriately
 
         memory_info.modules.append(module)
 
