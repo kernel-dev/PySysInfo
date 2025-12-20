@@ -123,7 +123,7 @@ def get_core_count() -> int:
     
     return physical_cores
 
-def fetch_cpu_info(wmi_instance) -> CPUInfo:
+def fetch_cpu_info() -> CPUInfo:
     cpu_info = CPUInfo()
     cpuid = CPUID()
 

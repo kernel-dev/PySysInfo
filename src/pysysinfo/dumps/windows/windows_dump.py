@@ -25,7 +25,7 @@ class WindowsHardwareManager:
 
     def fetch_cpu_info(self):
         pass
-        self.info.cpu = fetch_cpu_info(self.wmi_instance)
+        self.info.cpu = fetch_cpu_info()
 
     def fetch_memory_info(self):
         pass
