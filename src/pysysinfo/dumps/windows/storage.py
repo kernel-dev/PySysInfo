@@ -9,7 +9,7 @@ from operator import itemgetter
 def fetch_wmic_storage_info() -> StorageInfo:
     storage_info = StorageInfo()
 
-    command = r"wmic /namespace:\\root\Microsoft\Windows\Storage path MSFT_PhysicalDisk get /format:csv"
+    command = r"wmic /namespace:\\root\Microsoft\Windows\Storage path MSFT_PhysicalDisk get FriendlyName,MediaType,BusType,Size,Manufacturer /format:csv"
     try:
         result = subprocess.check_output(command, shell=True, text=True)
     except Exception as e:
@@ -28,7 +28,7 @@ def fetch_wmic_storage_info() -> StorageInfo:
 def fetch_wmi_cmdlet_storage_info() -> StorageInfo:
     storage_info = StorageInfo()
 
-    command = r'powershell -Command "Get-CimInstance -Namespace "root/Microsoft/Windows/Storage" -ClassName MSFT_PhysicalDisk | Select-Object DeviceId, FriendlyName, MediaType, BusType, Size, HealthStatus | ConvertTo-Csv -NoTypeInformation"'
+    command = r'powershell -Command "Get-CimInstance -Namespace "root/Microsoft/Windows/Storage" -ClassName MSFT_PhysicalDisk | Select-Object FriendlyName, MediaType, BusType, Size, Manufacturer | ConvertTo-Csv -NoTypeInformation"'
     try:
         result = subprocess.check_output(command, shell=True, text=True)
     except Exception as e:
@@ -52,6 +52,7 @@ def parse_cmd_output(lines: List[List[str]]) -> StorageInfo:
     media_type_idx = header.index("MediaType")
     bus_type_idx = header.index("BusType")
     friendly_name_idx = header.index("FriendlyName")
+    manufacturer_idx = header.index("Manufacturer")
     
     storage_info = StorageInfo()
     
@@ -62,7 +63,9 @@ def parse_cmd_output(lines: List[List[str]]) -> StorageInfo:
             # print("Bus Type:", line[bus_type_idx])
             # print("Friendly Name:", line[friendly_name_idx])
             disk = DiskInfo()
+            
             disk.model = line[friendly_name_idx]
+            disk.vendor_name = line[manufacturer_idx].strip() if line[manufacturer_idx].strip() else None
             disk.type = MEDIA_TYPE.get(int(line[media_type_idx]), "Unknown")
             disk.size = Megabyte(capacity=int(line[size_idx]) // (1024 * 1024)) if line[size_idx].isdigit() else None
             
@@ -90,7 +93,6 @@ def fetch_storage_info() -> StorageInfo:
     If that fails, falls back to using the PowerShell cmdlet.
     """
     response = fetch_wmic_storage_info()
-    print(response)
     if type(response.status) is FailedStatus:
         response = fetch_wmi_cmdlet_storage_info()
     
