@@ -4,8 +4,8 @@ from src.pysysinfo.models.component_model import ComponentInfo
 
 
 class CPUInfo(ComponentInfo):
-    model_name: str = ""
-    architecture: str = ""
+    model_name: Optional[str] = None
+    architecture: Optional[str] = None
     bitness: Optional[int] = None
     arch_version: Optional[str] = None
     vendor: Optional[str] = None
