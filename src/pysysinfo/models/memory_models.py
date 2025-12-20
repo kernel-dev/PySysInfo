@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 from pydantic import BaseModel
 
@@ -11,11 +11,12 @@ class MemoryModuleSlot(BaseModel):
     bank: str = ""
 
 class MemoryModuleInfo(BaseModel):
-    manufacturer: str = ""
-    part_number: str = ""
-    type: str = ""
-    capacity: StorageSize = Kilobyte()
-    slot: MemoryModuleSlot = MemoryModuleSlot()
+    manufacturer: Optional[str] = None
+    part_number: Optional[str] = None
+    type: Optional[str] = None
+    capacity: Optional[StorageSize] = None
+    frequency_mhz: Optional[int] = None
+    slot: Optional[MemoryModuleSlot] = None
 
 class MemoryInfo(ComponentInfo):
     modules: List[MemoryModuleInfo] = []

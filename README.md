@@ -26,7 +26,7 @@ A Python Library to simplify retrieval of hardware components of your computer.
 - Windows
   - [x] CPU
   - [ ] GPU
-  - [ ] Memory
+  - [x] Memory
   - [ ] Network
   - [ ] Audio
   - [ ] Motherboard
