@@ -1,10 +1,23 @@
 import json
+import os
 
-from src.pysysinfo.dumps.mac.mac_dump import MacHardwareManager
 import time
-
+import platform
 start_time = time.time()
-lhm = MacHardwareManager()
+# if the current os is windows:
+if os.name == "nt":
+    print("OS: Windows")
+    from src.pysysinfo.dumps.windows.windows_dump import WindowsHardwareManager
+    lhm = WindowsHardwareManager()
+elif platform.system() == "Darwin":
+    print("OS: Mac")
+    from src.pysysinfo.dumps.mac.mac_dump import MacHardwareManager
+    lhm = MacHardwareManager()
+else:
+    print("OS: Linux")
+    from src.pysysinfo.dumps.linux.linux_dump import LinuxHardwareManager
+    lhm = LinuxHardwareManager()
+
 
 lhm.fetch_cpu_info()
 lhm.fetch_memory_info()
