@@ -2,7 +2,7 @@ import re
 import subprocess
 
 from src.pysysinfo.models.cpu_models import CPUInfo
-from src.pysysinfo.models.status_models import FailedStatus, PartialStatus, make_partial_status
+from src.pysysinfo.models.status_models import FailedStatus, PartialStatus
 
 
 def fetch_arm_cpu_info(raw_cpu_info: str) -> CPUInfo:
@@ -21,7 +21,7 @@ def fetch_arm_cpu_info(raw_cpu_info: str) -> CPUInfo:
         cpu_info.status = PartialStatus(messages=cpu_info.status.messages)
         cpu_info.status.messages.append("Could not find model name")
 
-    arm_version = re.search(r"(?<=CPU architectures: ).+(?=\n)", raw_cpu_info)
+    arm_version = re.search(r"(?<=CPU architecture: ).+(?=\n)", raw_cpu_info)
     if arm_version:
         cpu_info.arch_version = arm_version.group(0)
     else:
@@ -32,8 +32,8 @@ def fetch_arm_cpu_info(raw_cpu_info: str) -> CPUInfo:
         threads = raw_cpu_info.count("processor")
         cpu_info.threads = threads
     except Exception as e:
-        # todo: log this appropriately
-        cpu_info.status = PartialStatus()
+        cpu_info.status = PartialStatus(messages=cpu_info.status.messages)
+        cpu_info.status.messages.append(str(e))
 
     # nothing more can be retrieved from /proc/cpuinfo for ARM
     return cpu_info
@@ -50,12 +50,13 @@ def fetch_x86_cpu_info(raw_cpu_info: str) -> CPUInfo:
     # To get the info, we only need to parse the first entry - i.e. the first CPU Thread
     cpu_lines = info_lines[0]
 
-    model = re.search(r"(?<=model name\t: ).+(?=\n)", cpu_lines)
+    model = re.search(r"(?<=model namesd\t: ).+(?=\n)", cpu_lines)
     if model:
         model = model.group(0)
         cpu_info.model_name = model
     else:
-        cpu_info.status = PartialStatus()
+        cpu_info.status = PartialStatus(messages=cpu_info.status.messages)
+        cpu_info.status.messages.append("Could not find model name")
 
     vendor = "intel" if "intel" in model.lower() else "amd"
     cpu_info.vendor = vendor
@@ -66,7 +67,8 @@ def fetch_x86_cpu_info(raw_cpu_info: str) -> CPUInfo:
         flags = flags.group(0)
     else:
         flags = ""
-        cpu_info.status = PartialStatus()
+        cpu_info.status = PartialStatus(messages=cpu_info.status.messages)
+        cpu_info.status.messages.append("Could not find feature flags")
 
     flags = [x.lower().strip() for x in flags.split(" ")]
 
@@ -78,7 +80,8 @@ def fetch_x86_cpu_info(raw_cpu_info: str) -> CPUInfo:
     if sse_flags:
         cpu_info.sse_flags = sse_flags
     else:
-        cpu_info.status = PartialStatus()
+        cpu_info.status = PartialStatus(messages=cpu_info.status.messages)
+        cpu_info.status.messages.append("Could not find SSE flags")
 
     """
     If "lm" is in flags, then x86-64 Long Mode is supported
@@ -91,7 +94,7 @@ def fetch_x86_cpu_info(raw_cpu_info: str) -> CPUInfo:
         cpu_info.bitness = 32
 
     # Cores are in the format of "cores : 6"
-    cores = re.search(r"(?<=cpu cores\t: ).+(?=\n)", cpu_lines)
+    cores = re.search(r"(?<=cpu coresss\t: ).+(?=\n)", cpu_lines)
 
     try:
         if cores:
@@ -99,8 +102,8 @@ def fetch_x86_cpu_info(raw_cpu_info: str) -> CPUInfo:
         else:
             cpu_info.status = PartialStatus()
     except Exception as e:
-
-        cpu_info.status = PartialStatus()
+        cpu_info.status = PartialStatus(messages=cpu_info.status.messages)
+        cpu_info.status.messages.append("Could not find cpu cores")
 
     # The number of CPU Threads is the number of times the processor data is enumerated.
     cpu_info.threads = len(info_lines)
