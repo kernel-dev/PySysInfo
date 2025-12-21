@@ -24,6 +24,9 @@ def get_ram_size_from_reg(reg) -> List[StorageSize]:
     This works for the first example (and most others encountered during testing),
     but not for the second example, which is from a 2006 C2D iMac
 
+    DeviceTree Specification:
+    https://devicetree-specification.readthedocs.io/en/latest/chapter2-devicetree-basics.html#reg
+
     :param reg: value of the "reg" key in IOreg.
     :return: Array of StorageSize (MegaByte) objects.
     """
