@@ -155,6 +155,26 @@ def fetch_memory_info() -> MemoryInfo:
             memory_info.status.messages.append("DIMM Capacity: " + str(e))
             continue
 
+        # Now we attempt to check if the memory has ECC support
+        """
+        In a memory module with Data Width 64 bits, there are 8 more bits with an error correcting code. 
+        so, the Total Width would be 64+8 = 72 bits.
+        
+        We can check the difference between DataWidth and TotalWidth, and equate it to DataWidth/8.
+        This is to account for dual channel memory sometimes being reported as 
+        128 bit DataWidth, and 144 bit TotalWidth.
+        """
+        total_width = int.from_bytes(value[0x08:0x0A], "little")
+        data_width = int.from_bytes(value[0x0A:0x0C], "little")
+
+        print("Total Width: " + str(total_width))
+        print("DataWidth: " + str(data_width))
+
+        if total_width - data_width == data_width//8:
+            module.supports_ecc = True
+        else:
+            module.supports_ecc = False
+
         memory_info.modules.append(module)
 
     return memory_info

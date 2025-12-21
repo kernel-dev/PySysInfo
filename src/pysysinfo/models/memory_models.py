@@ -18,6 +18,7 @@ class MemoryModuleInfo(BaseModel):
     capacity: Optional[StorageSize] = None
     frequency_mhz: Optional[int] = None
     slot: Optional[MemoryModuleSlot] = None
+    supports_ecc: Optional[bool] = None
 
 class MemoryInfo(ComponentInfo):
     modules: List[MemoryModuleInfo] = []

@@ -180,10 +180,10 @@ def fetch_memory_info():
                         dimm_speeds.extend([x.decode() for x in v.split(b'\x00') if x.decode().strip()])
 
                     if "type" in k.lower():
-                        dimm_types = [x.decode() for x in v.split(b'\x00') if x.decode().strip()]
+                        dimm_types.extend([x.decode() for x in v.split(b'\x00') if x.decode().strip()])
 
                     if "ecc-enabled" in k.lower():
-                        ecc_enabled = v
+                        ecc_enabled = ecc_enabled and v
 
                     if "slot-name" in k.lower():
                         # print(v)
@@ -230,7 +230,7 @@ def fetch_memory_info():
                 bank=dimm_slots[i][1]
             )
             module.frequency_mhz = int(dimm_speeds[i].lower().rstrip("mhz"))
-
+            module.supports_ecc = ecc_enabled
             memory_info.modules.append(module)
 
         except Exception as e:
