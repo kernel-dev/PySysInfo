@@ -90,7 +90,7 @@ def get_ram_size_from_system_profiler() -> List[StorageSize]:
                         sizes.append(int(size.rstrip(" GB")))
     except Exception as e:
         raise e
-    return sizes
+    return [Gigabyte(capacity=x) for x in sizes]
 
 def fetch_memory_info():
 
@@ -221,7 +221,7 @@ def fetch_memory_info():
             module.manufacturer = dimm_manufacturer[i]
             module.part_number = dimm_part_numbers[i]
             module.type = dimm_types[i]
-            module.capacity = Megabyte(capacity=dimm_sizes[i])
+            module.capacity = dimm_sizes[i]
             module.slot = MemoryModuleSlot(
                 channel=dimm_slots[i][0],
                 bank=dimm_slots[i][1]
