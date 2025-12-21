@@ -1,5 +1,3 @@
-import wmi
-
 from src.pysysinfo.dumps.windows.cpu import fetch_cpu_info
 from src.pysysinfo.dumps.windows.memory import fetch_memory_info
 from src.pysysinfo.dumps.windows.storage import fetch_storage_info
@@ -21,7 +19,6 @@ class WindowsHardwareManager:
             memory=MemoryInfo(),
             storage=StorageInfo()
         )
-        self.wmi_instance = self.c = wmi.WMI()
 
     def fetch_cpu_info(self):
         pass

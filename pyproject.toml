@@ -15,5 +15,5 @@ authors = [
 dependencies = [
     "pydantic",
     "pyobjc; sys_platform == 'darwin'",
-    "wmi; python_version >= '3.9' and sys_platform == 'win32'"
+#    "wmi; python_version >= '3.9' and sys_platform == 'win32'"
 ]
