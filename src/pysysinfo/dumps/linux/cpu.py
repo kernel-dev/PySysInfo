@@ -1,9 +1,20 @@
 import re
 import subprocess
+from typing import Optional
 
 from src.pysysinfo.models.cpu_models import CPUInfo
 from src.pysysinfo.models.status_models import FailedStatus, PartialStatus
 
+def fetch_cpu_cores() -> Optional[int]:
+    try:
+        result = subprocess.check_output(["lscpu", "-p"], shell=True, text=True)
+        lines = [x for x in result.splitlines() if not x.startswith("#")]
+        # Format: CPU,Core,Socket,Node,,L1d,L1i,L2,L3
+        core_ids = [x.split(",")[1] for x in lines]
+        # The number of distinct Core IDs is the number of cores
+        return len(set(core_ids))
+    except:
+        return None
 
 def fetch_arm_cpu_info(raw_cpu_info: str) -> CPUInfo:
     cpu_info = CPUInfo()
@@ -34,6 +45,13 @@ def fetch_arm_cpu_info(raw_cpu_info: str) -> CPUInfo:
     except Exception as e:
         cpu_info.status = PartialStatus(messages=cpu_info.status.messages)
         cpu_info.status.messages.append(str(e))
+
+    cores = fetch_cpu_cores()
+    if not cores:
+        cpu_info.status = PartialStatus(messages=cpu_info.status.messages)
+        cpu_info.status.messages.append("Could not find CPU cores")
+    else:
+        cpu_info.cores = cores
 
     # nothing more can be retrieved from /proc/cpuinfo for ARM
     return cpu_info
