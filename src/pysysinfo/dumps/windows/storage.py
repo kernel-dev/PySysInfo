@@ -68,7 +68,7 @@ def parse_cmd_output(lines: List[List[str]]) -> StorageInfo:
             disk = DiskInfo()
 
             disk.model = line[friendly_name_idx]
-            disk.vendor_name = line[manufacturer_idx].strip() if line[manufacturer_idx].strip() else None
+            disk.manufacturer = line[manufacturer_idx].strip() if line[manufacturer_idx].strip() else None
             disk.type = MEDIA_TYPE.get(int(line[media_type_idx]), "Unknown")
             disk.size = Megabyte(capacity=int(line[size_idx]) // (1024 * 1024)) if line[size_idx].isdigit() else None
 

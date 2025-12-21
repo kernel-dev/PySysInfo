@@ -9,6 +9,7 @@ from src.pysysinfo.models.size_models import StorageSize
 class DiskInfo(BaseModel):
     # Device Name
     model: Optional[str] = None
+    manufacturer: Optional[str] = None
     # Internal/External
     location: Optional[str] = None
     # PCIe/SCSI/etc.
@@ -18,7 +19,6 @@ class DiskInfo(BaseModel):
 
     device_id: Optional[str] = None
     vendor_id: Optional[str] = None
-    vendor_name: Optional[str] = None
     size: Optional[StorageSize] = None
     pass
 

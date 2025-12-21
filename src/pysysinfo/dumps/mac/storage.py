@@ -75,7 +75,7 @@ def fetch_storage_info() -> StorageInfo:
             disk.model = name
             disk.location = location
             disk.type = _type
-            disk.vendor_name = vendor
+            disk.manufacturer = vendor
 
             storage_info.disks.append(disk)
         except Exception as e:
