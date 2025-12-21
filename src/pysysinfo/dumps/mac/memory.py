@@ -1,10 +1,96 @@
 import plistlib
 import subprocess
+from typing import List
 
 from src.pysysinfo.models.memory_models import MemoryInfo, MemoryModuleInfo, MemoryModuleSlot
 from src.pysysinfo.models.status_models import FailedStatus, PartialStatus
-from src.pysysinfo.models.size_models import Megabyte
+from src.pysysinfo.models.size_models import Megabyte, StorageSize, Gigabyte
 
+
+def get_ram_size_from_reg(reg) -> List[StorageSize]:
+    """
+    Observed values of reg:
+    "02 00 00 00 00 00 00 00 02 00 00 00 00 00 00 00" -> Two sticks of 4GB each
+    "00 00 00 80 00 00 00 80 00 00 00 80 00 00 00 80" -> Two sticks of 2GB each
+
+    For simplicity, we can drop all '\x00's, and only retain the non-zero values.
+    Then, multiply every remaining hex-byte by 4096, to get an array of RAM Capacities.
+
+    (n * 0x010000 / 0x10) is used to multiply n by 4096.
+    - 0x010000 is 65536.
+    - 0x10 is 16.
+    - The multiplier is 65536 / 16 = 4096.
+
+    This works for the first example (and most others encountered during testing),
+    but not for the second example, which is from a 2006 C2D iMac
+
+    :param reg: value of the "reg" key in IOreg.
+    :return: Array of StorageSize (MegaByte) objects.
+    """
+
+    sizes = [round(n * 0x010000 / 0x10) for n in reg.replace(b"\x00", b"")]
+    return [Megabyte(capacity=x) for x in sizes]
+
+def get_arm_ram_info() -> MemoryInfo:
+    # ARM macOS doesn't expose all properties that x86 macs do.
+    memory_info = MemoryInfo()
+    memory_info.status.messages.append("ARM macOS only exposes partial RAM data.")
+
+    try:
+        value = subprocess.check_output(["system_profiler", "SPMemoryDataType", "-xml"])
+        pl = plistlib.loads(value, fmt=plistlib.FMT_XML)
+    except Exception as e:
+        memory_info.status = FailedStatus("Failed to parse SPMemoryDataType: " + str(e))
+        return memory_info
+
+    print(pl)
+    try:
+        for entry in pl:
+            print(entry["_items"])
+            sticks = entry["_items"]
+            for stick in sticks:
+                module = MemoryModuleInfo()
+                try:
+                    # This is a dictionary
+                    for k, v in stick.items():
+                        if k == "SPMemoryDataType" and v.strip():
+                            module.capacity = Gigabyte(capacity=int(v.strip().rstrip(" GB")))
+
+                        if "manufacturer" in k:
+                            module.manufacturer = v
+                        if "type" in k:
+                            module.type = v
+
+                    memory_info.modules.append(module)
+                except Exception as e:
+                    memory_info.status = PartialStatus(messages=memory_info.status.messages)
+                    memory_info.status.messages.append("Failed to parse SPMemoryDataType: " + str(e))
+
+    except Exception as e:
+        # We preserve messages if it was PartialStatus prior to this exception
+        memory_info.status = FailedStatus(messages=memory_info.status.messages)
+        memory_info.status.messages.append("Failed to parse SPMemoryDataType: " + str(e))
+    return memory_info
+
+def get_ram_size_from_system_profiler() -> List[StorageSize]:
+    sizes = []
+    try:
+        value = subprocess.check_output(["system_profiler", "SPMemoryDataType", "-xml"])
+        # value = subprocess.check_output(["cat", "/users/mahas/Downloads/c2d_profiler.txt"])
+        pl = plistlib.loads(value, fmt=plistlib.FMT_XML)
+        # pl is an array of dictionaries
+        for entry in pl:
+            items = entry["_items"]
+            for item in items:
+                sticks = item["_items"]
+                for stick in sticks:
+                    # print(stick)
+                    size = stick["dimm_size"]
+                    if size:
+                        sizes.append(int(size.rstrip(" GB")))
+    except Exception as e:
+        raise e
+    return sizes
 
 def fetch_memory_info():
 
@@ -21,8 +107,8 @@ def fetch_memory_info():
     arm64 for Apple Silicon
     """
     if "arm" in arch.lower():
-        memory_info.status = FailedStatus("Memory Info Retrieval not supported on Apple Silicon")
-        return memory_info
+        return get_arm_ram_info()
+
 
     """
     We get the output of ioreg as a Plist, and parse it using Python's Plist library.
@@ -73,27 +159,10 @@ def fetch_memory_info():
                     Since we have to accumulate all properties in their own arrays anyway,
                     and make the MemoryModuleInfo afterwards, there is no downsides to iterating through all keys.
                     """
-                    # we have to exactly match reg, because it can incorrectly match keys like IORegXYZ
-                    if k.lower() == "reg":
-                        """
-                        This key contains the capacity of the RAM module.
-                        
-                        Sample output:
-                        b'\x02\x00\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00'
-                        
-                        This, split into the number of RAM modules, gives us a value.
-                        The RAM Capacity is this value multiplied by 4096.
-                        
-                        For simplicity, we can drop all '\x00's, and only retain the non-zero values.
-                        Then, multiply every 16-bit offset by 4096, to get an array of RAM Capacities.
-                        
-                        (n * 0x010000 / 0x10) is used to multiply n by 4096.
-                        - 0x010000 is 65536.
-                        - 0x10 is 16.
-                        - The multiplier is 65536 / 16 = 4096. 
-                        """
-                        dimm_sizes.extend([round(n * 0x010000 / 0x10) for n in v.replace(b"\x00", b"")])
 
+                    # We use exact matching here because otherwise, it may match for IORegistryXYZ
+                    if k.lower() == "reg":
+                        dimm_sizes = get_ram_size_from_reg(v)
 
                     if "manufacturer" in k.lower():
                         dimm_manufacturer.extend([x.decode() for x in v.split(b'\x00') if x.decode().strip()])
@@ -116,6 +185,28 @@ def fetch_memory_info():
                     if "slot-name" in k.lower():
                         # print(v)
                         dimm_slots = [x.decode().split("/") for x in v.split(b'\x00') if x.decode().strip()]
+
+        # Now we attempt to get more accurate RAM Module Capacities
+        """
+        The "reg" key does not strictly encode the RAM size, but in a lot of machines, this does work.
+        From testing however, the behaviour assumed in get_ram_size_from_reg() is not consistent. 
+        So, we will use the output of `system_profiler SPMemoryDataType` to get the RAM sizes.
+        
+        Note that system_profiler may not be available in recovery environments.
+        Therefore, we initially load the values of the "reg" key.
+        Afterwards, replace the values by the output from system profiler.
+        If system profiler fails to work, we add a message that the RAM size may not be accurate, 
+        and retain the values from "reg". 
+        """
+        try:
+            sysprofiler_dimm_sizes = get_ram_size_from_system_profiler()
+            dimm_sizes = sysprofiler_dimm_sizes
+        except Exception as e:
+            # We don't have to make it a PartialStatus, because we already have semi-accurate data from the "reg" field.
+            memory_info.status.messages.append(
+                "Failed to get RAM size from system profiler. RAM Capacity may not be accurate: " + str(e)
+            )
+
 
     except Exception as e:
         memory_info.status = PartialStatus(messages=memory_info.status.messages)

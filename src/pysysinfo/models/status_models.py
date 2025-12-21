@@ -29,10 +29,15 @@ class FailedStatus(StatusModel):
     string: str = "failed"
     messages: List[str] = []
 
-    def __init__(self, message: Optional[str]=None):
+    def __init__(self, message: Optional[str]=None, messages: Optional[List[str]]=None):
         super().__init__()
+        if messages:
+            self.messages = messages
+        else:
+            self.messages = []
+
         if message:
-            self.messages = [message]
+            self.messages.append(message)
 
 
 """

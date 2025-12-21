@@ -13,6 +13,7 @@ class MemoryModuleSlot(BaseModel):
 class MemoryModuleInfo(BaseModel):
     manufacturer: Optional[str] = None
     part_number: Optional[str] = None
+    # DDR4/DDR5/etc.
     type: Optional[str] = None
     capacity: Optional[StorageSize] = None
     frequency_mhz: Optional[int] = None
