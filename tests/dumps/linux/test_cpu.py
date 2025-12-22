@@ -125,7 +125,7 @@ class TestLinuxCPU:
         assert "Could not find SSE flags" in cpu.status.messages
         assert "Could not find cpu cores" in cpu.status.messages
 
-    def test_fetch_cpu_info_success_x86(self, monkeypatch):
+    def test_fetch_cpu_info_x86_success(self, monkeypatch):
         raw = "model name\t: Intel CPU\nflags\t\t: lm sse\ncpu cores\t: 4\n\n"
         
         def mock_open(*args, **kwargs):
@@ -143,7 +143,7 @@ class TestLinuxCPU:
         assert cpu.architecture == "x86"
         assert cpu.model_name == "Intel CPU"
 
-    def test_fetch_cpu_info_success_arm(self, monkeypatch):
+    def test_fetch_cpu_info_arm_success(self, monkeypatch):
         raw = "Hardware\t: BCM2711\nCPU architecture: 8\nprocessor\t: 0\n"
         
         def mock_open(*args, **kwargs):
@@ -184,7 +184,10 @@ class TestLinuxCPU:
         assert isinstance(cpu.status, FailedStatus)
         assert "/proc/cpuinfo has no content" in cpu.status.messages
 
-    def test_fetch_cpu_info__rpi(self, monkeypatch):
+
+class TestLinuxCPURealWorld:
+
+    def test_fetch_cpu_info_rpi_success(self, monkeypatch):
         with open("tests/assets/raw_cpu_info/rpi.txt", "r") as f:
             raw = f.read()
         
@@ -208,7 +211,7 @@ class TestLinuxCPU:
         assert cpu.threads == 4
         assert cpu.cores == 4
 
-    def test_fetch_cpu_info__7200u(self, monkeypatch):
+    def test_fetch_cpu_info_7200u_success(self, monkeypatch):
         with open("tests/assets/raw_cpu_info/7200u.txt", "r") as f:
             raw = f.read()
         
