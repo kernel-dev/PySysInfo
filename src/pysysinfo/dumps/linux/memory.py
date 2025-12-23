@@ -158,7 +158,7 @@ def fetch_memory_info() -> MemoryInfo:
         total_width = int.from_bytes(value[0x08:0x0A], "little")
         data_width = int.from_bytes(value[0x0A:0x0C], "little")
 
-        if total_width - data_width == data_width // 8:
+        if total_width > data_width:
             module.supports_ecc = True
         else:
             module.supports_ecc = False
