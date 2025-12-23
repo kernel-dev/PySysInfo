@@ -9,6 +9,7 @@ from src.pysysinfo.dumps.linux.cpu import (
 )
 from src.pysysinfo.models.status_models import PartialStatus, FailedStatus
 
+
 class TestLinuxCPU:
 
     def test_fetch_cpu_cores_success(self, monkeypatch):
@@ -58,7 +59,6 @@ class TestLinuxCPU:
         assert cpu.cores == 4
         assert cpu.status.messages == []
 
-
     def test_fetch_arm_cpu_info_model_fallback(self, monkeypatch):
         raw = (
             "processor\t: 0\n"
@@ -71,7 +71,6 @@ class TestLinuxCPU:
         cpu = fetch_arm_cpu_info(raw)
 
         assert cpu.model_name == "Raspberry Pi 4"
-
 
     def test_fetch_arm_cpu_info_missing_fields(self, monkeypatch):
         raw = "processor\t: 0\n"
@@ -122,16 +121,16 @@ class TestLinuxCPU:
 
     def test_fetch_cpu_info_x86_success(self, monkeypatch):
         raw = "model name\t: Intel CPU\nflags\t\t: lm sse\ncpu cores\t: 4\n\n"
-        
+
         def mock_open(*args, **kwargs):
             from io import StringIO
             return StringIO(raw)
-        
+
         monkeypatch.setattr(builtins, "open", mock_open)
-        
+
         def mock_run(*args, **kwargs):
             return subprocess.CompletedProcess(args, 0, stdout="x86_64")
-        
+
         monkeypatch.setattr(subprocess, "run", mock_run)
 
         cpu = fetch_cpu_info()
@@ -140,18 +139,18 @@ class TestLinuxCPU:
 
     def test_fetch_cpu_info_arm_success(self, monkeypatch):
         raw = "Hardware\t: BCM2711\nCPU architecture: 8\nprocessor\t: 0\n"
-        
+
         def mock_open(*args, **kwargs):
             from io import StringIO
             return StringIO(raw)
-        
+
         monkeypatch.setattr(builtins, "open", mock_open)
-        
+
         def mock_run(*args, **kwargs):
             return subprocess.CompletedProcess(args, 0, stdout="aarch64")
-        
+
         monkeypatch.setattr(subprocess, "run", mock_run)
-        
+
         monkeypatch.setattr("src.pysysinfo.dumps.linux.cpu.fetch_cpu_cores", lambda: 4)
 
         cpu = fetch_cpu_info()
@@ -161,7 +160,7 @@ class TestLinuxCPU:
     def test_fetch_cpu_info_failure_file_open(self, monkeypatch):
         def mock_open(*args, **kwargs):
             raise FileNotFoundError("No such file")
-        
+
         monkeypatch.setattr(builtins, "open", mock_open)
 
         cpu = fetch_cpu_info()
@@ -172,7 +171,7 @@ class TestLinuxCPU:
         def mock_open(*args, **kwargs):
             from io import StringIO
             return StringIO("")
-        
+
         monkeypatch.setattr(builtins, "open", mock_open)
 
         cpu = fetch_cpu_info()
@@ -185,18 +184,18 @@ class TestLinuxCPURealWorld:
     def test_fetch_cpu_info_rpi_success(self, monkeypatch):
         with open("tests/assets/raw_cpu_info/rpi.txt", "r") as f:
             raw = f.read()
-        
+
         def mock_open(*args, **kwargs):
             from io import StringIO
             return StringIO(raw)
-        
+
         monkeypatch.setattr(builtins, "open", mock_open)
-        
+
         def mock_run(*args, **kwargs):
             return subprocess.CompletedProcess(args, 0, stdout="aarch64")
-        
+
         monkeypatch.setattr(subprocess, "run", mock_run)
-        
+
         monkeypatch.setattr("src.pysysinfo.dumps.linux.cpu.fetch_cpu_cores", lambda: 4)
 
         cpu = fetch_cpu_info()
@@ -209,16 +208,16 @@ class TestLinuxCPURealWorld:
     def test_fetch_cpu_info_7200u_success(self, monkeypatch):
         with open("tests/assets/raw_cpu_info/7200u.txt", "r") as f:
             raw = f.read()
-        
+
         def mock_open(*args, **kwargs):
             from io import StringIO
             return StringIO(raw)
-        
+
         monkeypatch.setattr(builtins, "open", mock_open)
-        
+
         def mock_run(*args, **kwargs):
             return subprocess.CompletedProcess(args, 0, stdout="x86_64")
-        
+
         monkeypatch.setattr(subprocess, "run", mock_run)
 
         cpu = fetch_cpu_info()
@@ -229,5 +228,3 @@ class TestLinuxCPURealWorld:
         assert cpu.cores == 2
         assert cpu.threads == 4
         assert "SSE4.2" in cpu.sse_flags
-
-    
