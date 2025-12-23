@@ -21,26 +21,26 @@ def fetch_arm_cpu_info(raw_cpu_info: str) -> CPUInfo:
 
     cpu_info.architecture = "ARM"
 
-    model = re.search(r"(?<=Hardware\t: ).+", raw_cpu_info)
-    model_alt = re.search(r"Model\t+: (.+)", raw_cpu_info)
+    model = re.search(r"Hardware\s+:\s+(.+)", raw_cpu_info)
+    model_alt = re.search(r"Model\s+:\s+(.+)", raw_cpu_info)
 
     if model:
-        cpu_info.model_name = model.group(0)
+        cpu_info.model_name = model.group(1)
     elif model_alt:
         cpu_info.model_name = model_alt.group(1)
     else:
         cpu_info.status = PartialStatus(messages=cpu_info.status.messages)
         cpu_info.status.messages.append("Could not find model name")
 
-    arm_version = re.search(r"(?<=CPU architecture: ).+", raw_cpu_info)
+    arm_version = re.search(r"CPU architecture:\s+(.+)", raw_cpu_info)
     if arm_version:
-        cpu_info.arch_version = arm_version.group(0)
+        cpu_info.arch_version = arm_version.group(1)
     else:
         cpu_info.status = PartialStatus(messages=cpu_info.status.messages)
         cpu_info.status.messages.append("Could not find architecture")
 
     try:
-        threads = raw_cpu_info.count("processor")
+        threads = len(re.findall(r"^processor\s+:", raw_cpu_info, re.MULTILINE))
         cpu_info.threads = threads
     except Exception as e:
         cpu_info.status = PartialStatus(messages=cpu_info.status.messages)
@@ -68,9 +68,9 @@ def fetch_x86_cpu_info(raw_cpu_info: str) -> CPUInfo:
     # To get the info, we only need to parse the first entry - i.e. the first CPU Thread
     cpu_lines = info_lines[0]
 
-    model = re.search(r"(?<=model name\t: ).+", cpu_lines)
+    model = re.search(r"model name\s+:\s+(.+)", cpu_lines)
     if model:
-        model = model.group(0)
+        model = model.group(1)
         cpu_info.model_name = model
         vendor = "intel" if "intel" in model.lower() else "amd" if "amd" in model.lower() else "unknown"
         cpu_info.vendor = vendor
@@ -80,9 +80,9 @@ def fetch_x86_cpu_info(raw_cpu_info: str) -> CPUInfo:
 
 
     # The CPU flags are in the format of "flags : sse sse2 sse3 ssse3 sse4_1 sse4_2 lm"
-    flags = re.search(r"(?<=flags\t\t: ).+", cpu_lines)
+    flags = re.search(r"flags\s+:\s+(.+)", cpu_lines)
     if flags:
-        flags = flags.group(0)
+        flags = flags.group(1)
     else:
         flags = ""
         cpu_info.status = PartialStatus(messages=cpu_info.status.messages)
@@ -112,11 +112,11 @@ def fetch_x86_cpu_info(raw_cpu_info: str) -> CPUInfo:
         cpu_info.bitness = 32
 
     # Cores are in the format of "cores : 6"
-    cores = re.search(r"(?<=cpu cores\t: ).+", cpu_lines)
+    cores = re.search(r"cpu cores\s+:\s+(.+)", cpu_lines)
 
     try:
         if cores:
-            cpu_info.cores = int(cores.group(0))
+            cpu_info.cores = int(cores.group(1))
         else:
             cpu_info.status = PartialStatus(messages=cpu_info.status.messages)
             cpu_info.status.messages.append("Could not find cpu cores")
