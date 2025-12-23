@@ -1,10 +1,10 @@
 import os
-import subprocess
 
 from src.pysysinfo.dumps.linux.dmi_decode import get_string_entry, MEMORY_TYPE
 from src.pysysinfo.models.memory_models import MemoryInfo, MemoryModuleSlot, MemoryModuleInfo
-from src.pysysinfo.models.status_models import PartialStatus, FailedStatus
 from src.pysysinfo.models.size_models import Megabyte, Kilobyte
+from src.pysysinfo.models.status_models import PartialStatus, FailedStatus
+
 
 def fetch_memory_info() -> MemoryInfo:
     memory_info = MemoryInfo()
@@ -158,7 +158,7 @@ def fetch_memory_info() -> MemoryInfo:
         total_width = int.from_bytes(value[0x08:0x0A], "little")
         data_width = int.from_bytes(value[0x0A:0x0C], "little")
 
-        if total_width - data_width == data_width//8:
+        if total_width - data_width == data_width // 8:
             module.supports_ecc = True
         else:
             module.supports_ecc = False

@@ -5,6 +5,7 @@ from typing import Optional
 from src.pysysinfo.models.cpu_models import CPUInfo
 from src.pysysinfo.models.status_models import FailedStatus, PartialStatus
 
+
 def fetch_cpu_cores() -> Optional[int]:
     try:
         result = subprocess.run(["lscpu", "-p"], capture_output=True, text=True).stdout
@@ -15,6 +16,7 @@ def fetch_cpu_cores() -> Optional[int]:
         return len(set(core_ids))
     except Exception as e:
         return None
+
 
 def fetch_arm_cpu_info(raw_cpu_info: str) -> CPUInfo:
     cpu_info = CPUInfo()
@@ -77,7 +79,6 @@ def fetch_x86_cpu_info(raw_cpu_info: str) -> CPUInfo:
     else:
         cpu_info.status = PartialStatus(messages=cpu_info.status.messages)
         cpu_info.status.messages.append("Could not find model name")
-
 
     # The CPU flags are in the format of "flags : sse sse2 sse3 ssse3 sse4_1 sse4_2 lm"
     flags = re.search(r"flags\s+:\s+(.+)", cpu_lines)

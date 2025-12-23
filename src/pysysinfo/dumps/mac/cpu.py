@@ -18,7 +18,7 @@ def fetch_cpu_info() -> CPUInfo:
         machdep.cpu.brand_string: Apple M3
         """
         # we split it into lines, and make a dictionary with key:value pairs
-        data = {k:v for (k,v) in [x.split(": ") for x in data.splitlines()]}
+        data = {k: v for (k, v) in [x.split(": ") for x in data.splitlines()]}
     except Exception as e:
         cpu_info.status = FailedStatus("Error while parsing sysctl: " + str(e))
         return cpu_info
@@ -127,7 +127,6 @@ def fetch_cpu_info() -> CPUInfo:
 
             sme2_presence = subprocess.check_output(["sysctl", "hw.optional.arm.FEAT_SME2"]).decode()
             sme2_presence = True if sme2_presence.split(": ")[1].strip() == "1" else False
-
 
             if sme_presence or sme2_presence:
                 cpu_info.arch_version = "9"

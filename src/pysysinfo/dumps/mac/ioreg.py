@@ -1,12 +1,12 @@
 # Credits to @[DhinakG](https://github.com/DhinkaG) for allowing us to copy over their `ioreg.py` abstraction implementation from OpenCore-Legacy-Patcher:
 # https://github.com/dortania/OpenCore-Legacy-Patcher/blob/f6ef7583eedc706e2bb70550fe847601ef258fcd/resources/ioreg.py
 
-import objc
 from typing import NewType, Union
+
+import objc
 from CoreFoundation import CFRelease, kCFAllocatorDefault
 from Foundation import NSBundle
 from PyObjCTools import Conversion
-
 
 IOKit = NSBundle.bundleWithIdentifier_("com.apple.framework.IOKit")
 
@@ -83,6 +83,7 @@ def IORegistryEntryCreateCFProperties(
 ) -> kern_return_t:
     raise NotImplementedError
 
+
 # kern_return_t IORegistryEntryGetLocationInPlane(io_registry_entry_t entry, const io_name_t plane, io_name_t location);
 def IORegistryEntryGetLocationInPlane(
         entry: io_registry_entry_t,
@@ -90,6 +91,7 @@ def IORegistryEntryGetLocationInPlane(
         location: io_name_t
 ) -> kern_return_t:
     raise NotImplementedError
+
 
 # CFTypeRef IORegistryEntrySearchCFProperty(io_registry_entry_t entry, const char *plane, CFStringRef key, CFAllocatorRef allocator, IOOptionBits options);
 def IORegistryEntrySearchCFProperty(
@@ -101,9 +103,11 @@ def IORegistryEntrySearchCFProperty(
 ) -> CFTypeRef:
     raise NotImplementedError
 
+
 # CFTypeRef IORegistryEntryCreateCFProperty(io_registry_entry_t entry, CFStringRef key, CFAllocatorRef allocator, IOOptionBits options);
 def IORegistryEntryCreateCFProperty(entry, key, allocator, options):
     raise NotImplementedError
+
 
 # kern_return_t IORegistryEntryGetParentEntry(io_registry_entry_t entry, const char *plane, io_registry_entry_t parent);
 def IORegistryEntryGetParentEntry(entry, plane, parent):
@@ -143,6 +147,7 @@ def IOServiceNameMatching(name):
 # CFMutableDictionaryRef IOServiceMatching(const char * name);
 def IOServiceMatching(name):
     raise NotImplementedError
+
 
 # boolean_t IOObjectConformsTo(io_object_t object, const char *className);
 def IOObjectConformsTo(object, className):

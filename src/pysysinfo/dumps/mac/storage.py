@@ -1,19 +1,15 @@
-from typing import Optional
-
-from src.pysysinfo.dumps.mac.ioreg import *
 from CoreFoundation import kCFAllocatorDefault
 
+from src.pysysinfo.dumps.mac.ioreg import *
 from src.pysysinfo.models.size_models import Megabyte
-from src.pysysinfo.models.storage_models import StorageInfo, DiskInfo
 from src.pysysinfo.models.status_models import PartialStatus
-
-from ctypes import byref, create_string_buffer
-
+from src.pysysinfo.models.storage_models import StorageInfo, DiskInfo
 
 STORAGE_MAP = {
     "Solid State": "Solid State Drive (SSD)",
     "Rotational": "Hard Disk Drive (HDD)",
 }
+
 
 def find_media(entry) -> dict:
     kr, iterator = IORegistryEntryGetChildIterator(
@@ -86,7 +82,8 @@ def fetch_storage_info() -> StorageInfo:
             # Name of vendor
             manufacturer = product.get("Vendor Name")
 
-            if manufacturer: manufacturer = manufacturer.strip()
+            if manufacturer:
+                manufacturer = manufacturer.strip()
             elif "apple" in name.lower():
                 manufacturer = "Apple"
 
@@ -125,7 +122,7 @@ def fetch_storage_info() -> StorageInfo:
             disk.manufacturer = manufacturer
 
             if size:
-                disk.size = Megabyte(capacity=size // (1024*1024))
+                disk.size = Megabyte(capacity=size // (1024 * 1024))
 
             storage_info.disks.append(disk)
         except Exception as e:

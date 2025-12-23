@@ -3,8 +3,8 @@ from typing import List
 
 from src.pysysinfo.dumps.windows.win_enum import MEMORY_TYPE
 from src.pysysinfo.models.memory_models import MemoryInfo, MemoryModuleInfo, MemoryModuleSlot
-from src.pysysinfo.models.status_models import PartialStatus, FailedStatus
 from src.pysysinfo.models.size_models import Megabyte
+from src.pysysinfo.models.status_models import PartialStatus, FailedStatus
 
 """
 the WMIC command-line utility is deprecated, and is replaced by PowerShell cmdlets.

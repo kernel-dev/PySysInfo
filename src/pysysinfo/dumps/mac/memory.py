@@ -3,8 +3,8 @@ import subprocess
 from typing import List
 
 from src.pysysinfo.models.memory_models import MemoryInfo, MemoryModuleInfo, MemoryModuleSlot
-from src.pysysinfo.models.status_models import FailedStatus, PartialStatus
 from src.pysysinfo.models.size_models import Megabyte, StorageSize, Gigabyte
+from src.pysysinfo.models.status_models import FailedStatus, PartialStatus
 
 
 def get_ram_size_from_reg(reg) -> List[StorageSize]:
@@ -33,6 +33,7 @@ def get_ram_size_from_reg(reg) -> List[StorageSize]:
 
     sizes = [round(n * 0x010000 / 0x10) for n in reg.replace(b"\x00", b"")]
     return [Megabyte(capacity=x) for x in sizes]
+
 
 def get_arm_ram_info() -> MemoryInfo:
     # ARM macOS doesn't expose all properties that x86 macs do.
@@ -75,6 +76,7 @@ def get_arm_ram_info() -> MemoryInfo:
         memory_info.status.messages.append("Failed to parse SPMemoryDataType: " + str(e))
     return memory_info
 
+
 def get_ram_size_from_system_profiler() -> List[StorageSize]:
     sizes = []
     try:
@@ -95,8 +97,8 @@ def get_ram_size_from_system_profiler() -> List[StorageSize]:
         raise e
     return [Gigabyte(capacity=x) for x in sizes]
 
-def fetch_memory_info():
 
+def fetch_memory_info():
     memory_info = MemoryInfo()
     """
     Memory Module Information, can only work on Intel and AMD machines.
@@ -111,7 +113,6 @@ def fetch_memory_info():
     """
     if "arm" in arch.lower():
         return get_arm_ram_info()
-
 
     """
     We get the output of ioreg as a Plist, and parse it using Python's Plist library.
