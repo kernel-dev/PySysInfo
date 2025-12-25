@@ -23,6 +23,9 @@ class GPUInfo(BaseModel):
     pcie_width: Optional[int] = None
     pcie_gen: Optional[int] = None
     vram: Optional[StorageSize] = None
+
+    apple_gpu_core_count: Optional[int] = None
+    apple_neural_core_count: Optional[int] = None
     pass
 
 class GraphicsInfo(ComponentInfo):

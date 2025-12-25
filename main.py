@@ -14,6 +14,7 @@ elif platform.system() == "Darwin":
     print("OS: Mac")
     from src.pysysinfo.dumps.mac.mac_dump import MacHardwareManager
     lhm = MacHardwareManager()
+    lhm.fetch_graphics_info()
 else:
     print("OS: Linux")
     from src.pysysinfo.dumps.linux.linux_dump import LinuxHardwareManager

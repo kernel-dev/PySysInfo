@@ -1,7 +1,9 @@
 from src.pysysinfo.dumps.mac.cpu import fetch_cpu_info
+from src.pysysinfo.dumps.mac.graphics import fetch_graphics_info
 from src.pysysinfo.dumps.mac.memory import fetch_memory_info
 from src.pysysinfo.dumps.mac.storage import fetch_storage_info
 from src.pysysinfo.models.cpu_models import CPUInfo
+from src.pysysinfo.models.gpu_models import GraphicsInfo
 from src.pysysinfo.models.info_models import MacHardwareInfo
 from src.pysysinfo.models.memory_models import MemoryInfo
 from src.pysysinfo.models.storage_models import StorageInfo
@@ -17,7 +19,8 @@ class MacHardwareManager:
         self.info = MacHardwareInfo(
             cpu=CPUInfo(),
             memory=MemoryInfo(),
-            storage=StorageInfo()
+            storage=StorageInfo(),
+            graphics=GraphicsInfo(),
         )
 
     def fetch_cpu_info(self):
@@ -28,3 +31,6 @@ class MacHardwareManager:
 
     def fetch_storage_info(self):
         self.info.storage = fetch_storage_info()
+
+    def fetch_graphics_info(self):
+        self.info.graphics = fetch_graphics_info()
