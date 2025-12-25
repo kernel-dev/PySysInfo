@@ -78,6 +78,7 @@ def fetch_graphics_info() -> GraphicsInfo:
                         bytes(reversed(device.get("device-id")))
                     ).decode()[4:]
                 )
+                # todo: get VRAM for non-ARM devices
             else:
                 gpu_config = device.get("GPUConfigurationVariable", {})
                 gpu.apple_gpu_core_count = gpu_config.get("num_cores")
@@ -90,7 +91,7 @@ def fetch_graphics_info() -> GraphicsInfo:
                 memory = subprocess.run(["sysctl", "hw.memsize"], capture_output=True).stdout.decode("utf-8")
                 memory = memory.split(":")[1].strip()
                 if memory.isnumeric():
-                    gpu.vram = Megabyte(capacity=int(memory)/(1024**2))
+                    gpu.vram = Megabyte(capacity=int(memory)//(1024**2))
 
             # Now we get the ACPI path for x86 devices
             if not is_arm:
