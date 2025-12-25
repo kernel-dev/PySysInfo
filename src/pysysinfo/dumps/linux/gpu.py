@@ -26,6 +26,13 @@ def fetch_vram_amd(device) -> Optional[int]:
     except:
         return None
 
+def fetch_vram_nvidia(device) -> Optional[int]:
+    command = f"nvidia-smi --id={device} --query-gpu=memory.total --format=csv,noheader,nounits"
+    output = subprocess.run(command, capture_output=True, text=True).stdout
+    # we do not try and except, we will catch the error in fetch_gpu_info
+
+    return int(output)
+
 def fetch_gpu_info() -> GraphicsInfo:
     graphics_info = GraphicsInfo()
 
@@ -80,6 +87,14 @@ def fetch_gpu_info() -> GraphicsInfo:
         if gpu.vendor_id == "0x1002":
             # get VRAM for AMD GPUs
             gpu.vram = Megabyte(capacity=fetch_vram_amd(device))
+        elif gpu.vendor_id.lower() == "0x10de":
+            # get VRAM for Nvidia GPUs
+            try:
+                gpu.vram = Megabyte(capacity=fetch_vram_nvidia(device))
+            except Exception as e:
+                graphics_info.status = PartialStatus(messages=graphics_info.status.messages)
+                graphics_info.status.messages.append(f"Could not get VRAM for NVIDIA GPU {device}: {e}")
+
 
         try:
             lspci_output = subprocess.run(["lspci", "-s", device, "-vmm"], capture_output=True, text=True).stdout
