@@ -199,3 +199,228 @@ class TestLinuxGPU:
         # Vendor ID should be None because it failed
         assert gpu.vendor_id is None
         # But we should still have the object
+
+    def test_fetch_gpu_info_skip_non_display(self, monkeypatch):
+        monkeypatch.setattr(os.path, "exists", lambda x: True)
+        monkeypatch.setattr(os, "listdir", lambda x: ["0000:04:00.0"])
+        
+        # Class 0x020000 is Network Controller (Base class 0x02)
+        file_contents = {
+            "class": "0x020000", 
+        }
+        
+        def custom_open(path, *args, **kwargs):
+            filename = os.path.basename(path)
+            if filename in file_contents:
+                return mock_open(read_data=file_contents[filename])()
+            raise FileNotFoundError(path)
+
+        monkeypatch.setattr(builtins, "open", custom_open)
+        
+        info = fetch_gpu_info()
+        
+        # Should be skipped, so no modules found
+        assert len(info.modules) == 0
+        assert isinstance(info.status, SuccessStatus)
+
+    def test_fetch_gpu_info_amd_vram_failure(self, monkeypatch):
+        monkeypatch.setattr(os.path, "exists", lambda x: True)
+        monkeypatch.setattr(os, "listdir", lambda x: ["0000:03:00.0"])
+        
+        file_contents = {
+            "class": "0x030000",
+            "vendor": "0x1002", # AMD
+            "device": "0x731f",
+            "current_link_width": "16",
+            "firmware_node/path": "\\_SB.PCI0.PEG0.PEGP"
+        }
+        
+        def custom_open(path, *args, **kwargs):
+            filename = os.path.basename(path)
+            if filename == "path" and "firmware_node" in path:
+                return mock_open(read_data=file_contents["firmware_node/path"])()
+            if filename in file_contents:
+                return mock_open(read_data=file_contents[filename])()
+            raise FileNotFoundError(path)
+
+        monkeypatch.setattr(builtins, "open", custom_open)
+        monkeypatch.setattr("src.pysysinfo.dumps.linux.gpu.get_pci_path_linux", lambda x: f"/PCI0@0/{x}")
+        
+        # Mock glob to return empty list (VRAM file not found)
+        monkeypatch.setattr("glob.glob", lambda x: [])
+        
+        monkeypatch.setattr(subprocess, "run", lambda *args, **kwargs: subprocess.CompletedProcess(args, 0, stdout=""))
+        
+        info = fetch_gpu_info()
+        
+        assert len(info.modules) == 1
+        gpu = info.modules[0]
+        assert gpu.vendor_id == "0x1002"
+        # VRAM should be None because fetch failed
+        assert gpu.vram is None
+
+    def test_fetch_gpu_info_nvidia_vram_failure(self, monkeypatch):
+        monkeypatch.setattr(os.path, "exists", lambda x: True)
+        monkeypatch.setattr(os, "listdir", lambda x: ["0000:01:00.0"])
+        
+        file_contents = {
+            "class": "0x030000",
+            "vendor": "0x10de", # Nvidia
+            "device": "0x1c03",
+            "current_link_width": "16",
+            "firmware_node/path": "\\_SB.PCI0.PEG0.PEGP"
+        }
+        
+        def custom_open(path, *args, **kwargs):
+            filename = os.path.basename(path)
+            if filename == "path" and "firmware_node" in path:
+                return mock_open(read_data=file_contents["firmware_node/path"])()
+            if filename in file_contents:
+                return mock_open(read_data=file_contents[filename])()
+            raise FileNotFoundError(path)
+
+        monkeypatch.setattr(builtins, "open", custom_open)
+        monkeypatch.setattr("src.pysysinfo.dumps.linux.gpu.get_pci_path_linux", lambda x: f"/PCI0@0/{x}")
+        
+        # Mock nvidia-smi failure
+        def mock_run(command, *args, **kwargs):
+            if command[0] == "nvidia-smi":
+                # Simulate failure
+                raise subprocess.CalledProcessError(1, command)
+            return subprocess.CompletedProcess(command, 0, stdout="")
+
+        monkeypatch.setattr(subprocess, "run", mock_run)
+        
+        info = fetch_gpu_info()
+        
+        assert len(info.modules) == 1
+        gpu = info.modules[0]
+        assert gpu.vendor_id == "0x10de"
+        assert gpu.vram is None
+        # Should have partial status due to vram failure
+        assert isinstance(info.status, PartialStatus)
+        assert any("VRAM" in msg for msg in info.status.messages)
+
+    def test_fetch_gpu_info_lspci_missing_fields(self, monkeypatch):
+        monkeypatch.setattr(os.path, "exists", lambda x: True)
+        monkeypatch.setattr(os, "listdir", lambda x: ["0000:00:02.0"])
+        
+        file_contents = {
+            "class": "0x030000",
+            "vendor": "0x8086",
+            "device": "0x5917",
+            "current_link_width": "0",
+            "firmware_node/path": "\\_SB.PCI0.GFX0"
+        }
+        
+        def custom_open(path, *args, **kwargs):
+            filename = os.path.basename(path)
+            if filename == "path" and "firmware_node" in path:
+                return mock_open(read_data=file_contents["firmware_node/path"])()
+            if filename in file_contents:
+                return mock_open(read_data=file_contents[filename])()
+            raise FileNotFoundError(path)
+
+        monkeypatch.setattr(builtins, "open", custom_open)
+        monkeypatch.setattr("src.pysysinfo.dumps.linux.gpu.get_pci_path_linux", lambda x: f"/PCI0@0/{x}")
+        
+        def mock_run(command, *args, **kwargs):
+            if command[0] == "lspci":
+                # Output missing SVendor and SDevice
+                output = (
+                    "Slot:	00:02.0\n"
+                    "Class:	VGA compatible controller\n"
+                    "Vendor:	Intel Corporation\n"
+                    "Device:	UHD Graphics 620\n"
+                )
+                return subprocess.CompletedProcess(command, 0, stdout=output)
+            return subprocess.CompletedProcess(command, 1)
+
+        monkeypatch.setattr(subprocess, "run", mock_run)
+        
+        info = fetch_gpu_info()
+        
+        assert len(info.modules) == 1
+        gpu = info.modules[0]
+        assert gpu.manufacturer == "Intel Corporation"
+        assert gpu.model == "UHD Graphics 620"
+        assert gpu.subsystem_manufacturer is None
+        assert gpu.subsystem_model is None
+
+    def test_fetch_gpu_info_acpi_path_failure(self, monkeypatch):
+        monkeypatch.setattr(os.path, "exists", lambda x: True)
+        monkeypatch.setattr(os, "listdir", lambda x: ["0000:00:02.0"])
+        
+        file_contents = {
+            "class": "0x030000",
+            "vendor": "0x8086",
+            "device": "0x5917",
+            "current_link_width": "0",
+        }
+        
+        def custom_open(path, *args, **kwargs):
+            filename = os.path.basename(path)
+            if filename == "path" and "firmware_node" in path:
+                # Simulate missing ACPI path file
+                raise FileNotFoundError("No ACPI path")
+            if filename in file_contents:
+                return mock_open(read_data=file_contents[filename])()
+            raise FileNotFoundError(path)
+
+        monkeypatch.setattr(builtins, "open", custom_open)
+        monkeypatch.setattr("src.pysysinfo.dumps.linux.gpu.get_pci_path_linux", lambda x: f"/PCI0@0/{x}")
+        monkeypatch.setattr(subprocess, "run", lambda *args, **kwargs: subprocess.CompletedProcess(args, 0, stdout=""))
+        
+        info = fetch_gpu_info()
+        
+        assert len(info.modules) == 1
+        gpu = info.modules[0]
+        assert gpu.vendor_id == "0x8086"
+        assert gpu.acpi_path is None
+        # Should be partial status
+        assert isinstance(info.status, PartialStatus)
+        assert any("ACPI path" in msg for msg in info.status.messages)
+
+    def test_fetch_vram_amd_exception(self, monkeypatch):
+        # Directly test the helper function
+        monkeypatch.setattr("glob.glob", lambda x: (_ for _ in ()).throw(Exception("Glob failed")))
+        
+        from src.pysysinfo.dumps.linux.gpu import fetch_vram_amd
+        assert fetch_vram_amd("0000:00:00.0") is None
+
+    def test_fetch_gpu_info_pci_path_failure(self, monkeypatch):
+        monkeypatch.setattr(os.path, "exists", lambda x: True)
+        monkeypatch.setattr(os, "listdir", lambda x: ["0000:00:02.0"])
+        
+        file_contents = {
+            "class": "0x030000",
+            "vendor": "0x8086",
+            "device": "0x5917",
+            "current_link_width": "0",
+            "firmware_node/path": "\\_SB.PCI0.GFX0"
+        }
+        
+        def custom_open(path, *args, **kwargs):
+            filename = os.path.basename(path)
+            if filename == "path" and "firmware_node" in path:
+                return mock_open(read_data=file_contents["firmware_node/path"])()
+            if filename in file_contents:
+                return mock_open(read_data=file_contents[filename])()
+            raise FileNotFoundError(path)
+
+        monkeypatch.setattr(builtins, "open", custom_open)
+        
+        # Mock get_pci_path_linux to fail
+        def mock_get_pci_path(device):
+            raise Exception("PCI path failed")
+            
+        monkeypatch.setattr("src.pysysinfo.dumps.linux.gpu.get_pci_path_linux", mock_get_pci_path)
+        monkeypatch.setattr(subprocess, "run", lambda *args, **kwargs: subprocess.CompletedProcess(args, 0, stdout=""))
+        
+        info = fetch_gpu_info()
+        
+        assert len(info.modules) == 1
+        gpu = info.modules[0]
+        assert gpu.pci_path is None
+        assert isinstance(info.status, PartialStatus)
+        assert any("PCI path" in msg for msg in info.status.messages)
