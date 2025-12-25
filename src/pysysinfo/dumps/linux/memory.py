@@ -66,7 +66,7 @@ def fetch_memory_info() -> MemoryInfo:
         # Attempt to get DIMM type
         try:
             # DIMM type value is stored at offset 12h
-            module.type = MEMORY_TYPE.get(value[0x12], "Unknown")
+            module.type = MEMORY_TYPE[value[0x12]]
         except Exception as e:
             memory_info.status = PartialStatus(messages=memory_info.status.messages)
             memory_info.status.messages.append("Error getting DIMM Type: " + str(e))
