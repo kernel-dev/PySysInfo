@@ -3,7 +3,7 @@ import subprocess
 import builtins
 from unittest.mock import MagicMock, mock_open
 
-from src.pysysinfo.dumps.linux.gpu import fetch_gpu_info
+from src.pysysinfo.dumps.linux.graphics import fetch_graphics_info
 from src.pysysinfo.models.status_models import FailedStatus, PartialStatus, SuccessStatus
 from src.pysysinfo.models.size_models import Megabyte
 
@@ -12,7 +12,7 @@ class TestLinuxGPU:
     def test_fetch_gpu_info_root_not_found(self, monkeypatch):
         monkeypatch.setattr(os.path, "exists", lambda x: False)
         
-        info = fetch_gpu_info()
+        info = fetch_graphics_info()
         
         assert isinstance(info.status, FailedStatus)
         assert "not found" in info.status.messages[0]
@@ -67,7 +67,7 @@ class TestLinuxGPU:
 
         monkeypatch.setattr(subprocess, "run", mock_run)
 
-        info = fetch_gpu_info()
+        info = fetch_graphics_info()
         
         assert isinstance(info.status, SuccessStatus)
         assert len(info.modules) == 2 # We mocked 2 devices, both use same file mocks so both appear as GPUs
@@ -113,7 +113,7 @@ class TestLinuxGPU:
 
         monkeypatch.setattr(subprocess, "run", mock_run)
         
-        info = fetch_gpu_info()
+        info = fetch_graphics_info()
         
         assert len(info.modules) == 1
         gpu = info.modules[0]
@@ -160,7 +160,7 @@ class TestLinuxGPU:
 
         monkeypatch.setattr(subprocess, "run", mock_run)
         
-        info = fetch_gpu_info()
+        info = fetch_graphics_info()
         
         assert len(info.modules) == 1
         gpu = info.modules[0]
@@ -191,7 +191,7 @@ class TestLinuxGPU:
             raise FileNotFoundError("lspci not found")
         monkeypatch.setattr(subprocess, "run", mock_run)
         
-        info = fetch_gpu_info()
+        info = fetch_graphics_info()
         
         assert isinstance(info.status, PartialStatus)
         assert len(info.modules) == 1
@@ -217,7 +217,7 @@ class TestLinuxGPU:
 
         monkeypatch.setattr(builtins, "open", custom_open)
         
-        info = fetch_gpu_info()
+        info = fetch_graphics_info()
         
         # Should be skipped, so no modules found
         assert len(info.modules) == 0
@@ -251,7 +251,7 @@ class TestLinuxGPU:
         
         monkeypatch.setattr(subprocess, "run", lambda *args, **kwargs: subprocess.CompletedProcess(args, 0, stdout=""))
         
-        info = fetch_gpu_info()
+        info = fetch_graphics_info()
         
         assert len(info.modules) == 1
         gpu = info.modules[0]
@@ -291,7 +291,7 @@ class TestLinuxGPU:
 
         monkeypatch.setattr(subprocess, "run", mock_run)
         
-        info = fetch_gpu_info()
+        info = fetch_graphics_info()
         
         assert len(info.modules) == 1
         gpu = info.modules[0]
@@ -338,7 +338,7 @@ class TestLinuxGPU:
 
         monkeypatch.setattr(subprocess, "run", mock_run)
         
-        info = fetch_gpu_info()
+        info = fetch_graphics_info()
         
         assert len(info.modules) == 1
         gpu = info.modules[0]
@@ -371,7 +371,7 @@ class TestLinuxGPU:
         monkeypatch.setattr("src.pysysinfo.dumps.linux.gpu.get_pci_path_linux", lambda x: f"/PCI0@0/{x}")
         monkeypatch.setattr(subprocess, "run", lambda *args, **kwargs: subprocess.CompletedProcess(args, 0, stdout=""))
         
-        info = fetch_gpu_info()
+        info = fetch_graphics_info()
         
         assert len(info.modules) == 1
         gpu = info.modules[0]
@@ -385,7 +385,7 @@ class TestLinuxGPU:
         # Directly test the helper function
         monkeypatch.setattr("glob.glob", lambda x: (_ for _ in ()).throw(Exception("Glob failed")))
         
-        from src.pysysinfo.dumps.linux.gpu import fetch_vram_amd
+        from src.pysysinfo.dumps.linux.graphics import fetch_vram_amd
         assert fetch_vram_amd("0000:00:00.0") is None
 
     def test_fetch_gpu_info_pci_path_failure(self, monkeypatch):
@@ -417,7 +417,7 @@ class TestLinuxGPU:
         monkeypatch.setattr("src.pysysinfo.dumps.linux.gpu.get_pci_path_linux", mock_get_pci_path)
         monkeypatch.setattr(subprocess, "run", lambda *args, **kwargs: subprocess.CompletedProcess(args, 0, stdout=""))
         
-        info = fetch_gpu_info()
+        info = fetch_graphics_info()
         
         assert len(info.modules) == 1
         gpu = info.modules[0]

@@ -1,5 +1,5 @@
 from src.pysysinfo.dumps.linux.cpu import fetch_cpu_info
-from src.pysysinfo.dumps.linux.gpu import fetch_gpu_info
+from src.pysysinfo.dumps.linux.graphics import fetch_graphics_info
 from src.pysysinfo.dumps.linux.memory import fetch_memory_info
 from src.pysysinfo.dumps.linux.storage import fetch_storage_info
 from src.pysysinfo.models.gpu_models import GraphicsInfo
@@ -33,4 +33,4 @@ class LinuxHardwareManager:
         self.info.storage = fetch_storage_info()
 
     def fetch_graphics_info(self):
-        self.info.graphics = fetch_gpu_info()
+        self.info.graphics = fetch_graphics_info()

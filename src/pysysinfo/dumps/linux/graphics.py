@@ -33,7 +33,7 @@ def fetch_vram_nvidia(device) -> Optional[int]:
 
     return int(output)
 
-def fetch_gpu_info() -> GraphicsInfo:
+def fetch_graphics_info() -> GraphicsInfo:
     graphics_info = GraphicsInfo()
 
     ROOT_PATH = "/sys/bus/pci/devices/"
