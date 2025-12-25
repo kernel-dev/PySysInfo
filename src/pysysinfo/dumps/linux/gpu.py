@@ -27,7 +27,7 @@ def fetch_vram_amd(device) -> Optional[int]:
         return None
 
 def fetch_vram_nvidia(device) -> Optional[int]:
-    command = f"nvidia-smi --id={device} --query-gpu=memory.total --format=csv,noheader,nounits"
+    command = ["nvidia-smi", f"--id={device}", "--query-gpu=memory.total", "--format=csv,noheader,nounits"]
     output = subprocess.run(command, capture_output=True, text=True).stdout
     # we do not try and except, we will catch the error in fetch_gpu_info
 
@@ -67,7 +67,7 @@ def fetch_gpu_info() -> GraphicsInfo:
             gpu.device_id = open(os.path.join(path, "device")).read().strip()
             width = open(os.path.join(path, "current_link_width")).read().strip()
             if width.isnumeric() and int(width) > 0:
-                gpu.width = int(width)
+                gpu.pcie_width = int(width)
         except Exception as e:
             graphics_info.status = PartialStatus(messages=graphics_info.status.messages)
             graphics_info.status.messages.append(f"Could not get GPU properties: {e}")
