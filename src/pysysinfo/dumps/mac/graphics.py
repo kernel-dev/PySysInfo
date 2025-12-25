@@ -4,6 +4,7 @@ import subprocess
 from src.pysysinfo.dumps.mac.common import construct_pci_path_mac
 from src.pysysinfo.models.gpu_models import GraphicsInfo, GPUInfo
 from src.pysysinfo.dumps.mac.ioreg import *
+from src.pysysinfo.models.size_models import Megabyte
 from src.pysysinfo.models.status_models import FailedStatus, PartialStatus
 
 
@@ -85,6 +86,11 @@ def fetch_graphics_info() -> GraphicsInfo:
                 gpu.subsystem_manufacturer = "Apple Inc."
                 # We use subsystem_model for the gpu generation
                 gpu.subsystem_model = str(gpu_config.get("gpu_gen")) if gpu_config.get("gpu_gen") else None
+
+                memory = subprocess.run(["sysctl", "hw.memsize"], capture_output=True).stdout.decode("utf-8")
+                memory = memory.split(":")[1].strip()
+                if memory.isnumeric():
+                    gpu.vram = Megabyte(capacity=int(memory)/(1024**2))
 
             # Now we get the ACPI path for x86 devices
             if not is_arm:
