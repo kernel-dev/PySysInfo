@@ -4,7 +4,7 @@ import os
 
 
 def get_pci_path_linux(device_slot: str):
-    # Format: <domain>:<bus>:<slot>.<function>
+    # device_slot format: <domain>:<bus>:<slot>.<function>
 
     # Construct PCI path
     # E.g: PciRoot(0x0)/Pci(0x2,0x0)
