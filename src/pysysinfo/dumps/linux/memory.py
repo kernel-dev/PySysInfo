@@ -56,7 +56,7 @@ def fetch_memory_info() -> MemoryInfo:
 
         except Exception as e:
             memory_info.status = PartialStatus(messages=memory_info.status.messages)
-            memory_info.status.messages.append("Reading DMI Entries: " + str(e))
+            memory_info.status.messages.append("Error Reading DMI Entries: " + str(e))
             continue
 
         # Redefining here in case somehow it gets referenced before assignment
@@ -66,10 +66,10 @@ def fetch_memory_info() -> MemoryInfo:
         # Attempt to get DIMM type
         try:
             # DIMM type value is stored at offset 12h
-            module.type = MEMORY_TYPE[value[0x12]]
+            module.type = MEMORY_TYPE.get(value[0x12], "Unknown")
         except Exception as e:
             memory_info.status = PartialStatus(messages=memory_info.status.messages)
-            memory_info.status.messages.append("DIMM Type: " + str(e))
+            memory_info.status.messages.append("Error getting DIMM Type: " + str(e))
             continue
 
         # Attempt to obtain DIMM Location
@@ -80,7 +80,7 @@ def fetch_memory_info() -> MemoryInfo:
             )
         except Exception as e:
             memory_info.status = PartialStatus(messages=memory_info.status.messages)
-            memory_info.status.messages.append("DIMM Location: " + str(e))
+            memory_info.status.messages.append("Error getting DIMM Location: " + str(e))
             continue
 
         # Attempt to obtain manufacturer
@@ -88,7 +88,7 @@ def fetch_memory_info() -> MemoryInfo:
             module.manufacturer = get_string_entry(strings, value[0x17])
         except Exception as e:
             memory_info.status = PartialStatus(messages=memory_info.status.messages)
-            memory_info.status.messages.append("DIMM Manufacturer: " + str(e))
+            memory_info.status.messages.append("Error getting DIMM Manufacturer: " + str(e))
             continue
 
         # Attempt to obtain capacity
