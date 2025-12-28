@@ -1,7 +1,6 @@
 import csv
 import html
 import io
-import json
 import re
 import subprocess
 import winreg
@@ -19,9 +18,8 @@ def fetch_acpi_path(pnp_device_id: str):
     escaped = html.unescape(pnp_device_id)
     ps_script = f"""
         Get-PnpDeviceProperty -InstanceId "{escaped}" -KeyName DEVPKEY_Device_LocationPaths | 
-        Select-Object -ExpandProperty Data | ConvertTo-Json
+        Select-Object -ExpandProperty Data
         """
-    pass
     try:
         result = subprocess.run(["powershell", "-Command", ps_script], capture_output=True, text=True)
     except:
@@ -29,7 +27,7 @@ def fetch_acpi_path(pnp_device_id: str):
     if not result.stdout and not result.stdout.strip():
         return None
 
-    paths = json.loads(result.stdout)
+    paths = result.stdout.splitlines()
     acpi_path = None
     pciroot = None
 
@@ -38,7 +36,6 @@ def fetch_acpi_path(pnp_device_id: str):
             acpi_path = path
         if path.startswith("PCIROOT"):
             pciroot = path
-
     return acpi_path, pciroot
 
 
