@@ -8,7 +8,7 @@ A Python Library to simplify retrieval of hardware components of your computer.
 
 - Linux
   - [x] CPU
-  - [ ] GPU
+  - [x] GPU
   - [x] Memory
   - [ ] Network
   - [ ] Audio
@@ -17,7 +17,7 @@ A Python Library to simplify retrieval of hardware components of your computer.
   - [x] Storage
 - macOS
   - [x] CPU
-  - [ ] GPU
+  - [x] GPU* [could get more info than what is currently discovered]
   - [x] Memory
   - [ ] Network
   - [ ] Audio
