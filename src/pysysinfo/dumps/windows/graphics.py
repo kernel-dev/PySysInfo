@@ -3,6 +3,7 @@ import html
 import io
 import re
 import subprocess
+import time
 import winreg
 from typing import Optional
 
@@ -187,7 +188,7 @@ def parse_cmd_output(lines: list) -> GraphicsInfo:
                 gpu.vram = Megabyte(capacity=(int(vram) // 1024 // 1024))
 
             # Attempt to get PCIe width and link speed for Nvidia
-            if gpu.vendor_id and gpu.vendor_id.lower() == "0x10de" or True:
+            if gpu.vendor_id and gpu.vendor_id.lower() == "0x10de":
                 # device_address is a 32 bit integer, where the high 16 bits are Device number
                 # and the low 16 bits are the function number.
                 # The format of the PCI location string is {domain}:{bus}:{device}.{function}
@@ -196,7 +197,10 @@ def parse_cmd_output(lines: list) -> GraphicsInfo:
                 device_num = (int(device_address) >> 16) & 0xFFFF
                 func_num = int(device_address) & 0xFFFF
                 nvidia_smi_id = f"0000:{int(bus_number):02x}:{device_num:02x}.{func_num:02x}"
+                start_time = time.time()
                 gpu_name, pci_width, pci_gen, vram_total = fetch_gpu_details_nvidia(nvidia_smi_id)
+                print("Time for SMI:", time.time() - start_time)
+                print(gpu_name, pci_width, pci_gen, vram_total)
                 if pci_width: gpu.pcie_width = pci_width
                 if pci_gen: gpu.pcie_gen = pci_gen
 
