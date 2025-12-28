@@ -4,7 +4,10 @@ import os
 
 
 def get_pci_path_linux(device_slot: str):
-    # device_slot format: <domain>:<bus>:<slot>.<function>
+    """
+    :param device_slot: format: <domain>:<bus>:<slot>.<function>
+    :return: PCI Path
+    """
 
     # Construct PCI path
     # E.g: PciRoot(0x0)/Pci(0x2,0x0)
@@ -38,8 +41,8 @@ def get_pci_path_linux(device_slot: str):
 
 def _get_address_components(slot_name):
     """
-    Parses PCI slot name (domain:bus:device.function)
-    and returns a tuple of hex strings (device, function).
+    :param slot_name: format: <domain>:<bus>:<slot>.<function>
+    :return: Tuple of address components
     """
     try:
         # slot_name example: 0000:00:1f.3

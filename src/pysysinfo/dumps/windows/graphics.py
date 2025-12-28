@@ -12,6 +12,7 @@ from src.pysysinfo.models.gpu_models import GraphicsInfo
 from src.pysysinfo.models.size_models import Megabyte
 from src.pysysinfo.models.status_models import FailedStatus
 from src.pysysinfo.models.status_models import PartialStatus
+from src.pysysinfo.util.nvidia import fetch_gpu_details_nvidia
 
 
 def fetch_additional_properties(pnp_device_id: str):
@@ -191,11 +192,13 @@ def parse_cmd_output(lines: list) -> GraphicsInfo:
                 # and the low 16 bits are the function number.
                 # The format of the PCI location string is {domain}:{bus}:{device}.{function}
                 # We can assume domain is 0000
+                # todo: requires testing
                 device_num = (int(device_address) >> 16) & 0xFFFF
                 func_num = int(device_address) & 0xFFFF
-                nvidia_smi_id = f"0000:{bus_number:02x}:{device_num:02x}.{func_num:02x}"
-                print(nvidia_smi_id)
-                pass
+                nvidia_smi_id = f"0000:{int(bus_number):02x}:{device_num:02x}.{func_num:02x}"
+                gpu_name, pci_width, pci_gen, vram_total = fetch_gpu_details_nvidia(nvidia_smi_id)
+                if pci_width: gpu.pcie_width = pci_width
+                if pci_gen: gpu.pcie_gen = pci_gen
 
             graphics_info.modules.append(gpu)
 
