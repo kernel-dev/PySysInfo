@@ -154,8 +154,9 @@ def parse_cmd_output(lines: list) -> GraphicsInfo:
             gpu.manufacturer = line[manufacturer_idx]
             pnp_device_id = line[pnp_device_idx]
             drv_version = line[drv_version_idx]
-
+            start = time.time()
             acpi_path, pci_root, bus_number, device_address  = fetch_additional_properties(pnp_device_id)
+            print("Time for additional details:", time.time() - start)
             gpu.acpi_path = format_acpi_path(acpi_path)
             gpu.pci_path = format_pci_path(pci_root)
 
@@ -197,9 +198,7 @@ def parse_cmd_output(lines: list) -> GraphicsInfo:
                 device_num = (int(device_address) >> 16) & 0xFFFF
                 func_num = int(device_address) & 0xFFFF
                 nvidia_smi_id = f"0000:{int(bus_number):02x}:{device_num:02x}.{func_num:02x}"
-                start_time = time.time()
                 gpu_name, pci_width, pci_gen, vram_total = fetch_gpu_details_nvidia(nvidia_smi_id)
-                print("Time for SMI:", time.time() - start_time)
                 print(gpu_name, pci_width, pci_gen, vram_total)
                 if pci_width: gpu.pcie_width = pci_width
                 if pci_gen: gpu.pcie_gen = pci_gen
