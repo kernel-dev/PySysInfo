@@ -186,8 +186,15 @@ def parse_cmd_output(lines: list) -> GraphicsInfo:
                 gpu.vram = Megabyte(capacity=(int(vram) // 1024 // 1024))
 
             # Attempt to get PCIe width and link speed for Nvidia
-            if gpu.vendor_id and gpu.vendor_id.lower() == "0x10de":
-                nvidia_smi_id = None
+            if gpu.vendor_id and gpu.vendor_id.lower() == "0x10de" or True:
+                # device_address is a 32 bit integer, where the high 16 bits are Device number
+                # and the low 16 bits are the function number.
+                # The format of the PCI location string is {domain}:{bus}:{device}.{function}
+                # We can assume domain is 0000
+                device_num = (device_address >> 16) & 0xFFFF
+                func_num = device_address & 0xFFFF
+                nvidia_smi_id = f"0000:{bus_number:02x}:{device_address:02x}.{func_num:02x}"
+                print(nvidia_smi_id)
                 pass
 
             graphics_info.modules.append(gpu)
