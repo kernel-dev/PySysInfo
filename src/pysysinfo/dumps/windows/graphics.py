@@ -11,6 +11,20 @@ from src.pysysinfo.models.status_models import PartialStatus
 from src.pysysinfo.models.gpu_models import GraphicsInfo
 from src.pysysinfo.models.status_models import FailedStatus
 
+def fetch_acpi_path(pnp_device_id: str):
+    escaped = pnp_device_id.encode("unicode_escape").decode("ascii")
+    command = ("wmic path Win32_PnPEntity "
+               f"WHERE \"PNPDeviceID={escaped}\" "
+               "get DEVPKEY_Device_LocationPaths "
+               # "AdapterCompatibility,Name,AdapterRAM,VideoProcessor,PNPDeviceID,DriverVersion "
+               "/format:csv")
+    pass
+    try:
+        result = subprocess.check_output(command, shell=True, text=True)
+        print(result)
+    except Exception as e:
+        print(e)
+
 def fetch_vram_from_registry(device_name: str, driver_version: str) -> Optional[int]:
     key_path = r"SYSTEM\CurrentControlSet\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318}"
     with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, key_path) as key:
@@ -108,6 +122,7 @@ def parse_cmd_output(lines: list) -> GraphicsInfo:
             gpu.manufacturer = line[manufacturer_idx]
             pnp_device_id = line[pnp_device_idx]
             drv_version = line[drv_version_idx]
+            fetch_acpi_path(pnp_device_id)
 
             """
             The PNPDeviceID is of the form ****VEN_1234&DEV_5678&SUBSYS_9ABCDE0F.****
