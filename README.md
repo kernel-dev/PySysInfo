@@ -27,7 +27,7 @@ A Python Library to simplify retrieval of hardware components of your computer.
   - [ ] Display
 - Windows
   - [x] CPU
-  - [ ] GPU
+  - [x] GPU* [PCIe gen info only for Nvidia GPUs]
   - [x] Memory
   - [ ] Network
   - [ ] Audio
@@ -38,7 +38,7 @@ A Python Library to simplify retrieval of hardware components of your computer.
 ### Supporting Features
 
 - [ ] PCI Lookup - DeviceHunt
-- [ ] PCI Lookup - [Homepage](https://pci-ids.ucw.cz) - [GitHub](https://github.com/pciutils/pciids/blob/master/pci.ids)
+- [ ] PCI Lookup - [PCI IDs Repository](https://pci-ids.ucw.cz) - [GitHub](https://github.com/pciutils/pciids/blob/master/pci.ids)
 - [ ] Intel ARK and AMD Equivalent
 - [ ] Logging
 - [ ] Working Library
