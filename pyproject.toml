@@ -12,8 +12,15 @@ license = {text = "BSD-3-Clause"}
 authors = [
     {name = "Mahasvan", email = "mahasvan@gmail.com"}
 ]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: BSD License",
+    "Operating System :: OS Independent",
+]
 dependencies = [
     "pydantic",
     "pyobjc; sys_platform == 'darwin'",
-#    "wmi; python_version >= '3.9' and sys_platform == 'win32'"
 ]
+
+[tool.setuptools.packages.find]
+where = ["src"]

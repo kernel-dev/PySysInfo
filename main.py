@@ -1,23 +1,24 @@
 import json
 import os
-
+import sys
 import time
 import platform
+
+# Add src to path so we can import pysysinfo
+sys.path.append(os.path.join(os.path.dirname(__file__), "src"))
+
+from pysysinfo import HardwareManager
 
 global_start_time = time.time()
 
 if os.name == "nt":
     print("OS: Windows")
-    from src.pysysinfo.dumps.windows.windows_dump import WindowsHardwareManager
-    lhm = WindowsHardwareManager()
 elif platform.system() == "Darwin":
     print("OS: Mac")
-    from src.pysysinfo.dumps.mac.mac_dump import MacHardwareManager
-    lhm = MacHardwareManager()
 else:
     print("OS: Linux")
-    from src.pysysinfo.dumps.linux.linux_dump import LinuxHardwareManager
-    lhm = LinuxHardwareManager()
+
+lhm = HardwareManager()
 
 loading_end_time = time.time()
 
