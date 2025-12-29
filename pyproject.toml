@@ -2,9 +2,13 @@
 requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
 
+[tool.setuptools.dynamic]
+version = {attr = "pysysinfo.__version__"}
+
 [project]
 name = "PySysInfo"
-version = "0.0.1"
+dynamic = ["version"]
+
 description = "A cross-platform system information gatherer"
 readme = "README.md"
 requires-python = ">=3.9"
