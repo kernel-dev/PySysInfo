@@ -202,6 +202,8 @@ def parse_cmd_output(lines: list) -> GraphicsInfo:
                 print(gpu_name, pci_width, pci_gen, vram_total)
                 if pci_width: gpu.pcie_width = pci_width
                 if pci_gen: gpu.pcie_gen = pci_gen
+            # todo: From what I looked, there is no consistent reliable method to get this additional info for AMD GPUs.
+            # todo: Additional details for Intel ARC GPUs
 
             graphics_info.modules.append(gpu)
 
