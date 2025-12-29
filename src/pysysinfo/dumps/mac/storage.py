@@ -1,9 +1,9 @@
 from CoreFoundation import kCFAllocatorDefault
 
-from src.pysysinfo.dumps.mac.ioreg import *
-from src.pysysinfo.models.size_models import Megabyte
-from src.pysysinfo.models.status_models import PartialStatus
-from src.pysysinfo.models.storage_models import StorageInfo, DiskInfo
+from pysysinfo.dumps.mac.ioreg import *
+from pysysinfo.models.size_models import Megabyte
+from pysysinfo.models.status_models import PartialStatus
+from pysysinfo.models.storage_models import StorageInfo, DiskInfo
 
 STORAGE_MAP = {
     "Solid State": "Solid State Drive (SSD)",

@@ -1,8 +1,8 @@
 import os
 
-from src.pysysinfo.models.size_models import Megabyte
-from src.pysysinfo.models.status_models import FailedStatus, PartialStatus
-from src.pysysinfo.models.storage_models import StorageInfo, DiskInfo
+from pysysinfo.models.size_models import Megabyte
+from pysysinfo.models.status_models import FailedStatus, PartialStatus
+from pysysinfo.models.storage_models import StorageInfo, DiskInfo
 
 
 def fetch_storage_info() -> StorageInfo:

@@ -1,7 +1,7 @@
 import subprocess
 
-from src.pysysinfo.models.cpu_models import CPUInfo
-from src.pysysinfo.models.status_models import PartialStatus, FailedStatus
+from pysysinfo.models.cpu_models import CPUInfo
+from pysysinfo.models.status_models import PartialStatus, FailedStatus
 
 
 def fetch_cpu_info() -> CPUInfo:

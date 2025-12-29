@@ -1,6 +1,6 @@
 from typing import List, Optional
 
-from src.pysysinfo.models.component_model import ComponentInfo
+from pysysinfo.models.component_model import ComponentInfo
 
 
 class CPUInfo(ComponentInfo):

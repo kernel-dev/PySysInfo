@@ -2,9 +2,9 @@ import plistlib
 import subprocess
 from typing import List
 
-from src.pysysinfo.models.memory_models import MemoryInfo, MemoryModuleInfo, MemoryModuleSlot
-from src.pysysinfo.models.size_models import Megabyte, StorageSize, Gigabyte
-from src.pysysinfo.models.status_models import FailedStatus, PartialStatus
+from pysysinfo.models.memory_models import MemoryInfo, MemoryModuleInfo, MemoryModuleSlot
+from pysysinfo.models.size_models import Megabyte, StorageSize, Gigabyte
+from pysysinfo.models.status_models import FailedStatus, PartialStatus
 
 
 def get_ram_size_from_reg(reg) -> List[StorageSize]:

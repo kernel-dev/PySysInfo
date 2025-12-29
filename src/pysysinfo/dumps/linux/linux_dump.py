@@ -1,10 +1,10 @@
-from src.pysysinfo.dumps.linux.cpu import fetch_cpu_info
-from src.pysysinfo.dumps.linux.graphics import fetch_graphics_info
-from src.pysysinfo.dumps.linux.memory import fetch_memory_info
-from src.pysysinfo.dumps.linux.storage import fetch_storage_info
-from src.pysysinfo.models.gpu_models import GraphicsInfo
-from src.pysysinfo.models.info_models import CPUInfo, LinuxHardwareInfo, MemoryInfo
-from src.pysysinfo.models.storage_models import StorageInfo
+from pysysinfo.dumps.linux.cpu import fetch_cpu_info
+from pysysinfo.dumps.linux.graphics import fetch_graphics_info
+from pysysinfo.dumps.linux.memory import fetch_memory_info
+from pysysinfo.dumps.linux.storage import fetch_storage_info
+from pysysinfo.models.gpu_models import GraphicsInfo
+from pysysinfo.models.info_models import CPUInfo, LinuxHardwareInfo, MemoryInfo
+from pysysinfo.models.storage_models import StorageInfo
 
 
 class LinuxHardwareManager:

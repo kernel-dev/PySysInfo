@@ -4,9 +4,9 @@ import winreg
 from ctypes import wintypes
 from typing import List
 
-from src.pysysinfo.dumps.windows.win_enum import FEATURE_ID_MAP
-from src.pysysinfo.models.cpu_models import CPUInfo
-from src.pysysinfo.models.status_models import PartialStatus, FailedStatus
+from pysysinfo.dumps.windows.win_enum import FEATURE_ID_MAP
+from pysysinfo.models.cpu_models import CPUInfo
+from pysysinfo.models.status_models import PartialStatus, FailedStatus
 
 kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
 kernel32.IsProcessorFeaturePresent.argtypes = [wintypes.DWORD]

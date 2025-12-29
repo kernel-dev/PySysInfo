@@ -2,8 +2,8 @@ from typing import List, Optional
 
 from pydantic import BaseModel
 
-from src.pysysinfo.models.component_model import ComponentInfo
-from src.pysysinfo.models.size_models import StorageSize
+from pysysinfo.models.component_model import ComponentInfo
+from pysysinfo.models.size_models import StorageSize
 
 
 class DiskInfo(BaseModel):

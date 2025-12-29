@@ -3,11 +3,11 @@ import subprocess
 import glob
 from typing import Optional, Tuple
 
-from src.pysysinfo.dumps.linux.common import get_pci_path_linux
-from src.pysysinfo.models.gpu_models import GPUInfo, GraphicsInfo
-from src.pysysinfo.models.size_models import Megabyte
-from src.pysysinfo.models.status_models import FailedStatus, PartialStatus
-from src.pysysinfo.util.nvidia import fetch_gpu_details_nvidia
+from pysysinfo.dumps.linux.common import get_pci_path_linux
+from pysysinfo.models.gpu_models import GPUInfo, GraphicsInfo
+from pysysinfo.models.size_models import Megabyte
+from pysysinfo.models.status_models import FailedStatus, PartialStatus
+from pysysinfo.util.nvidia import fetch_gpu_details_nvidia
 
 
 # Currently, the info in /sys/class/drm/cardX is being used.

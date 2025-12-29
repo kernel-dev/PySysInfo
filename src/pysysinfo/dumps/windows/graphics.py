@@ -7,13 +7,13 @@ import time
 import winreg
 from typing import Optional
 
-from src.pysysinfo.dumps.windows.common import format_acpi_path, format_pci_path
-from src.pysysinfo.models.gpu_models import GPUInfo
-from src.pysysinfo.models.gpu_models import GraphicsInfo
-from src.pysysinfo.models.size_models import Megabyte
-from src.pysysinfo.models.status_models import FailedStatus
-from src.pysysinfo.models.status_models import PartialStatus
-from src.pysysinfo.util.nvidia import fetch_gpu_details_nvidia
+from pysysinfo.dumps.windows.common import format_acpi_path, format_pci_path
+from pysysinfo.models.gpu_models import GPUInfo
+from pysysinfo.models.gpu_models import GraphicsInfo
+from pysysinfo.models.size_models import Megabyte
+from pysysinfo.models.status_models import FailedStatus
+from pysysinfo.models.status_models import PartialStatus
+from pysysinfo.util.nvidia import fetch_gpu_details_nvidia
 
 
 def fetch_additional_properties(pnp_device_id: str):

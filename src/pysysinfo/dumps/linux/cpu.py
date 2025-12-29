@@ -2,8 +2,8 @@ import re
 import subprocess
 from typing import Optional
 
-from src.pysysinfo.models.cpu_models import CPUInfo
-from src.pysysinfo.models.status_models import FailedStatus, PartialStatus
+from pysysinfo.models.cpu_models import CPUInfo
+from pysysinfo.models.status_models import FailedStatus, PartialStatus
 
 
 def fetch_cpu_cores() -> Optional[int]:

@@ -1,10 +1,10 @@
 import subprocess
 from typing import List
 
-from src.pysysinfo.dumps.windows.win_enum import MEDIA_TYPE, BUS_TYPE
-from src.pysysinfo.models.size_models import Megabyte
-from src.pysysinfo.models.status_models import PartialStatus, FailedStatus
-from src.pysysinfo.models.storage_models import StorageInfo, DiskInfo
+from pysysinfo.dumps.windows.win_enum import MEDIA_TYPE, BUS_TYPE
+from pysysinfo.models.size_models import Megabyte
+from pysysinfo.models.status_models import PartialStatus, FailedStatus
+from pysysinfo.models.storage_models import StorageInfo, DiskInfo
 
 
 def fetch_wmic_storage_info() -> StorageInfo:
