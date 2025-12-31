@@ -1,16 +1,16 @@
 from typing import List, Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class StatusModel(BaseModel):
     string: str
-    messages: List[str]
+    messages: List[str] = Field(default_factory=list)
 
 
 class SuccessStatus(StatusModel):
     string: str = "success"
-    messages: List[str] = []
+    messages: List[str] = Field(default_factory=list)
 
 
 class PartialStatus(StatusModel):
@@ -18,7 +18,7 @@ class PartialStatus(StatusModel):
     Class to denote a Partially failed discovery of a particular component.
     """
     string: str = "partial"
-    messages: List[str] = []
+    messages: List[str] = Field(default_factory=list)
 
 
 class FailedStatus(StatusModel):
@@ -30,17 +30,14 @@ class FailedStatus(StatusModel):
     ```
     """
     string: str = "failed"
-    messages: List[str] = []
+    messages: List[str] = Field(default_factory=list)
 
     def __init__(self, message: Optional[str] = None, messages: Optional[List[str]] = None):
-        super().__init__()
-        if messages:
-            self.messages = messages
-        else:
-            self.messages = []
-
+        # Ensure each instance gets its own list
+        base_messages = list(messages) if messages else []
         if message:
-            self.messages.append(message)
+            base_messages.append(message)
+        super().__init__(string="failed", messages=base_messages)
 
 
 """

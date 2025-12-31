@@ -1,6 +1,7 @@
 from typing import Optional, List
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
+
 from pysysinfo.models.component_model import ComponentInfo
 from pysysinfo.models.size_models import StorageSize
 
@@ -12,14 +13,14 @@ class GPUInfo(BaseModel):
     #: This is the hexadecimal number that identifies the manufacturer of the GPU.
     #: Format: ``0xPQRS``
     vendor_id: Optional[str] = None
-    
+
     #: This is the hexadecimal number that identifies the GPU model.
     #: Format: ``0xPQRS``
     device_id: Optional[str] = None
 
     #: GPU vendor. ``NVIDIA``, for example.
     manufacturer: Optional[str] = None
-    
+
     #: The manufacturer of the GPU. For example, it may be ``Lenovo`` on a Thinkpad.
     subsystem_manufacturer: Optional[str] = None
     #: The model name given by the subsystem manufacturer.
@@ -46,4 +47,4 @@ class GPUInfo(BaseModel):
 
 class GraphicsInfo(ComponentInfo):
     #: List of GPU modules present in the system.
-    modules: List[GPUInfo] = []
+    modules: List[GPUInfo] = Field(default_factory=list)

@@ -1,8 +1,9 @@
 from typing import List, Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
+
 from pysysinfo.models.component_model import ComponentInfo
-from pysysinfo.models.size_models import StorageSize, Kilobyte
+from pysysinfo.models.size_models import StorageSize
 
 
 class MemoryModuleSlot(BaseModel):
@@ -22,4 +23,4 @@ class MemoryModuleInfo(BaseModel):
 
 
 class MemoryInfo(ComponentInfo):
-    modules: List[MemoryModuleInfo] = []
+    modules: List[MemoryModuleInfo] = Field(default_factory=list)
