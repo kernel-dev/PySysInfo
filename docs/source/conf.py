@@ -23,7 +23,14 @@ add_module_names = False
 
 autodoc_pydantic_model_show_json = False
 autodoc_pydantic_settings_show_json = False
+autoclass_content = "class"
 
+autodoc_default_options = {
+    'member-order': 'bysource',
+    'special-members': '__init__',
+    'undoc-members': True,
+    'exclude-members': '__weakref__, __init___'
+}
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration

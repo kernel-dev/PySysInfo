@@ -12,6 +12,9 @@ CPU
 =============
 .. autopydantic_model:: pysysinfo.models.cpu_models.CPUInfo
     :show-inheritance:
+    :inherited-members: ComponentInfo
+    :exclude-members: __init__
+    
 
 =============
 GPU
@@ -19,13 +22,12 @@ GPU
 
 .. autopydantic_model:: pysysinfo.models.gpu_models.GraphicsInfo
     :show-inheritance:
+    :inherited-members: ComponentInfo
+    :exclude-members: __init__
 
 .. autopydantic_model:: pysysinfo.models.gpu_models.GPUInfo
-    :show-inheritance:
+    :exclude-members: __init__
 
-
-- ``GraphicsInfo``
-- ``GPUInfo``
 - ``MemoryInfo``
 - ``MemoryModuleInfo``
 - ``MemoryModuleSlot``
