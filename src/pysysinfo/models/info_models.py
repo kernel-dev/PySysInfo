@@ -1,6 +1,7 @@
 from typing import Optional
 
 from pydantic import BaseModel
+
 from pysysinfo.models.cpu_models import CPUInfo
 from pysysinfo.models.gpu_models import GraphicsInfo
 from pysysinfo.models.memory_models import MemoryInfo
