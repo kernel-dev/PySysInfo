@@ -15,7 +15,6 @@ CPU
     :inherited-members: ComponentInfo
     :exclude-members: __init__
 
-
 =============
 GPU
 =============
@@ -34,14 +33,25 @@ GPU
 - ``StorageInfo``
 - ``DiskInfo``
 
-Capacities
-----------
-- ``Kilobyte``: Storage size in KB. See [src/pysysinfo/models/size_models.py](src/pysysinfo/models/size_models.py#L9-L11).
-- ``Megabyte``: Storage size in MB. See [src/pysysinfo/models/size_models.py](src/pysysinfo/models/size_models.py#L14-L16).
-- ``Gigabyte``: Storage size in GB. See [src/pysysinfo/models/size_models.py](src/pysysinfo/models/size_models.py#L19-L21).
+-------------
+Status Models
+-------------
 
-Statuses
---------
-- ``SuccessStatus``: Marks successful discovery for a component. See [src/pysysinfo/models/status_models.py](src/pysysinfo/models/status_models.py#L11-L13).
-- ``PartialStatus``: Signals partial discovery with accumulated messages. See [src/pysysinfo/models/status_models.py](src/pysysinfo/models/status_models.py#L16-L21).
-- ``FailedStatus``: Denotes failure to collect data, preserving one or more error messages. See [src/pysysinfo/models/status_models.py](src/pysysinfo/models/status_models.py#L24-L44).
+.. autopydantic_model:: pysysinfo.models.status_models.SuccessStatus
+    :exclude-members: __init__
+    :show-inheritance:
+
+.. autopydantic_model:: pysysinfo.models.status_models.PartialStatus
+    :exclude-members: __init__
+    :show-inheritance:
+
+.. autopydantic_model:: pysysinfo.models.status_models.FailedStatus
+    :exclude-members: __init__
+    :show-inheritance:
+
+.. autopydantic_model:: pysysinfo.models.status_models.StatusModel
+    :exclude-members: __init__
+
+---------------
+Capacity Models
+---------------
