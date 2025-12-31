@@ -215,6 +215,6 @@ def parse_cmd_output(lines: list) -> GraphicsInfo:
 
 def fetch_graphics_info() -> GraphicsInfo:
     graphics_info = fetch_wmic_graphics_info()
-    if type(graphics_info.status) is FailedStatus:
+    if isinstance(graphics_info.status, FailedStatus):
         graphics_info = fetch_wmi_cmdlet_graphics_info()
     return graphics_info

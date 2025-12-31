@@ -122,7 +122,7 @@ def parse_cmd_output(lines: List[List[str]]):
 
 def fetch_memory_info() -> MemoryInfo:
     memory_info = fetch_wmic_memory_info()
-    if type(memory_info.status) is FailedStatus:
+    if isinstance(memory_info.status, FailedStatus):
         memory_info = fetch_wmi_cmdlet_memory_info()
 
     return memory_info

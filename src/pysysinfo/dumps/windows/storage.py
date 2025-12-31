@@ -98,7 +98,7 @@ def fetch_storage_info() -> StorageInfo:
     If that fails, falls back to using the PowerShell cmdlet.
     """
     response = fetch_wmic_storage_info()
-    if type(response.status) is FailedStatus:
+    if isinstance(response.status, FailedStatus):
         response = fetch_wmi_cmdlet_storage_info()
 
     return response

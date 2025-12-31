@@ -57,7 +57,7 @@ if it is FailureStatus, the discovery of that component would have probably stop
 
 The above code snippet can be replaced with the below snippet, and would yield the same result. 
 ```
-if type(cpu_info.status) is PartialStatus:
+if isinstance(cpu_info.status, PartialStatus):
     cpu_info.status.messages.append("My New Debug Message")
 else:
     cpu_info.status = PartialStatus(messages=["My New Debug Message"])]
