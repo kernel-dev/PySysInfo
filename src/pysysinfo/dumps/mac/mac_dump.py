@@ -13,7 +13,7 @@ from pysysinfo.models.storage_models import StorageInfo
 
 class MacHardwareManager(HardwareManagerInterface):
     """
-    Instance, implementing `DeviceManager`, for extracting system information
+    Implements :class:`pysysinfo.models.info_models.HardwareManagerInterface`, for extracting system information
     from macOS using `sysctl` and IOreg
     """
 
