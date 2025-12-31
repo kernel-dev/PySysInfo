@@ -34,21 +34,21 @@ class HardwareManagerInterface:
     info: HardwareInfo
 
     def fetch_cpu_info(self) -> CPUInfo:
-        """Fetches CPU Information. Returns a :class:`pysysinfo.models.cpu_models.CPUInfo` object."""
+        """Fetches CPU Information."""
         pass
 
     def fetch_graphics_info(self) -> GraphicsInfo:
-        """Fetches GPU Information. Returns a :class:`pysysinfo.models.gpu_models.GraphicsInfo` object."""
+        """Fetches GPU Information."""
         pass
 
     def fetch_memory_info(self) -> MemoryInfo:
-        """Fetches RAM Information. Returns a :class:`pysysinfo.models.memory_models.MemoryInfo` object."""
+        """Fetches RAM Information."""
         pass
 
     def fetch_storage_info(self) -> StorageInfo:
-        """Fetches Disk Information. Returns a :class:`pysysinfo.models.storage_models.StorageInfo` object."""
+        """Fetches Disk Information."""
         pass
 
     def fetch_hardware_info(self) -> HardwareInfo:
-        """Fetches all hardware Information. Returns a :class:`pysysinfo.models.info_models.HardwareInfo` object."""
+        """Fetches all hardware Information."""
         pass
