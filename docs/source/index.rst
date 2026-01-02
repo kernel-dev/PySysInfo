@@ -19,6 +19,8 @@ Highlights
    :caption: Contents
 
    quickstart
+   hardware_managers
+   querying_info
    theory
    classes
    models
