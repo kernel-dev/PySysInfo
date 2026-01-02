@@ -7,7 +7,7 @@ from pysysinfo.dumps.linux.cpu import (
     fetch_x86_cpu_info,
     fetch_cpu_info,
 )
-from pysysinfo.models.status_models import Status, StatusType
+from pysysinfo.models.status_models import StatusType
 
 
 class TestLinuxCPU:

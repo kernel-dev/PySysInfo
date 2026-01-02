@@ -4,7 +4,7 @@ from unittest.mock import MagicMock
 
 from pysysinfo.dumps.linux.memory import fetch_memory_info
 from pysysinfo.models.size_models import Megabyte, Kilobyte
-from pysysinfo.models.status_models import Status, StatusType
+from pysysinfo.models.status_models import StatusType
 
 
 class TestLinuxMemory:

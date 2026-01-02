@@ -4,7 +4,7 @@ import subprocess
 from unittest.mock import mock_open
 
 from pysysinfo.dumps.linux.graphics import fetch_graphics_info, get_pcie_gen, fetch_vram_amd
-from pysysinfo.models.status_models import Status, StatusType
+from pysysinfo.models.status_models import StatusType
 
 
 class TestLinuxGraphics:
