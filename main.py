@@ -7,7 +7,9 @@ import platform
 # Add src to path so we can import pysysinfo
 sys.path.append(os.path.join(os.path.dirname(__file__), "src"))
 
-from pysysinfo import HardwareManager
+import pysysinfo
+
+print("Version:", pysysinfo.__version__)
 
 global_start_time = time.time()
 
@@ -18,7 +20,7 @@ elif platform.system() == "Darwin":
 else:
     print("OS: Linux")
 
-hm = HardwareManager()
+hm = pysysinfo.HardwareManager()
 
 loading_end_time = time.time()
 
