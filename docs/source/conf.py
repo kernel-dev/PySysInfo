@@ -34,10 +34,14 @@ if sys.platform != "darwin":
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
+
+import pysysinfo
+
+
 project = 'PySysInfo'
 copyright = '2025, Mahasvan Mohan'
 author = 'Mahasvan Mohan'
-release = '0.0.1'
+release = pysysinfo.__version__
 
 autodoc_class_signature = "separated"
 add_module_names = False
