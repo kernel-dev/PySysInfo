@@ -7,7 +7,7 @@ from pysysinfo.dumps.linux.cpu import (
     fetch_x86_cpu_info,
     fetch_cpu_info,
 )
-from pysysinfo.models.status_models import PartialStatus, FailedStatus
+from pysysinfo.models.status_models import Status, StatusType
 
 
 class TestLinuxCPU:
@@ -79,7 +79,7 @@ class TestLinuxCPU:
 
         cpu = fetch_arm_cpu_info(raw)
 
-        assert isinstance(cpu.status, PartialStatus)
+        assert cpu.status.type == StatusType.PARTIAL
         assert cpu.status.messages is not None
 
     def test_fetch_x86_cpu_info_success(self):
@@ -116,7 +116,7 @@ class TestLinuxCPU:
 
         cpu = fetch_x86_cpu_info(raw)
 
-        assert isinstance(cpu.status, PartialStatus)
+        assert cpu.status.type == StatusType.PARTIAL
         assert cpu.status.messages is not None
 
     def test_fetch_cpu_info_x86_success(self, monkeypatch):
@@ -164,7 +164,7 @@ class TestLinuxCPU:
         monkeypatch.setattr(builtins, "open", mock_open)
 
         cpu = fetch_cpu_info()
-        assert isinstance(cpu.status, FailedStatus)
+        assert cpu.status.type == StatusType.FAILED
         assert cpu.status.messages is not None
 
     def test_fetch_cpu_info_empty_file(self, monkeypatch):
@@ -175,7 +175,7 @@ class TestLinuxCPU:
         monkeypatch.setattr(builtins, "open", mock_open)
 
         cpu = fetch_cpu_info()
-        assert isinstance(cpu.status, FailedStatus)
+        assert cpu.status.type == StatusType.FAILED
         assert cpu.status.messages is not None
 
 

@@ -4,7 +4,7 @@ from unittest.mock import MagicMock
 
 from pysysinfo.dumps.linux.memory import fetch_memory_info
 from pysysinfo.models.size_models import Megabyte, Kilobyte
-from pysysinfo.models.status_models import FailedStatus, PartialStatus, SuccessStatus
+from pysysinfo.models.status_models import Status, StatusType
 
 
 class TestLinuxMemory:
@@ -14,7 +14,7 @@ class TestLinuxMemory:
 
         memory_info = fetch_memory_info()
 
-        assert isinstance(memory_info.status, FailedStatus)
+        assert memory_info.status.type == StatusType.FAILED
         assert memory_info.status.messages is not None
 
     def test_fetch_memory_info_permission_error(self, monkeypatch):
@@ -36,7 +36,7 @@ class TestLinuxMemory:
 
         memory_info = fetch_memory_info()
 
-        assert isinstance(memory_info.status, FailedStatus)
+        assert memory_info.status.type == StatusType.FAILED
         assert memory_info.status.messages is not None
 
     def _create_dmi_blob(self,
@@ -148,7 +148,7 @@ class TestLinuxMemory:
 
         memory_info = fetch_memory_info()
 
-        assert isinstance(memory_info.status, SuccessStatus)
+        assert memory_info.status.type == StatusType.SUCCESS
         assert len(memory_info.modules) == 1
         module = memory_info.modules[0]
 
@@ -207,7 +207,7 @@ class TestLinuxMemory:
         # Code says: memory_info.status.messages.append("Unknown DIMM Size") and continue
         # So modules list should be empty
         assert len(memory_info.modules) == 0
-        assert isinstance(memory_info.status, PartialStatus)
+        assert memory_info.status.type == StatusType.PARTIAL
         assert memory_info.status.messages is not None
 
     def test_fetch_memory_info_extended_speed(self, monkeypatch):
@@ -243,7 +243,7 @@ class TestLinuxMemory:
         monkeypatch.setattr(builtins, "open", mock_open)
 
         memory_info = fetch_memory_info()
-        assert isinstance(memory_info.status, PartialStatus)
+        assert memory_info.status.type == StatusType.PARTIAL
         # It will fail at value[0x1A] access
         assert memory_info.status.messages is not None
 
@@ -293,7 +293,7 @@ class TestLinuxMemory:
         monkeypatch.setattr(builtins, "open", mock_open)
 
         memory_info = fetch_memory_info()
-        assert isinstance(memory_info.status, PartialStatus)
+        assert memory_info.status.type == StatusType.PARTIAL
         assert memory_info.status.messages is not None
 
     def test_fetch_memory_info_location_error(self, monkeypatch):
@@ -315,7 +315,7 @@ class TestLinuxMemory:
         monkeypatch.setattr(builtins, "open", mock_open)
 
         memory_info = fetch_memory_info()
-        assert isinstance(memory_info.status, PartialStatus)
+        assert memory_info.status.type == StatusType.PARTIAL
         assert memory_info.status.messages is not None
 
     def test_fetch_memory_info_manufacturer_error(self, monkeypatch):
@@ -337,7 +337,7 @@ class TestLinuxMemory:
         monkeypatch.setattr(builtins, "open", mock_open)
 
         memory_info = fetch_memory_info()
-        assert isinstance(memory_info.status, PartialStatus)
+        assert memory_info.status.type == StatusType.PARTIAL
         assert memory_info.status.messages is not None
 
     def test_fetch_memory_info_capacity_error(self, monkeypatch):
@@ -362,5 +362,5 @@ class TestLinuxMemory:
         monkeypatch.setattr("pysysinfo.dumps.linux.memory.Megabyte", mock_megabyte)
 
         memory_info = fetch_memory_info()
-        assert isinstance(memory_info.status, PartialStatus)
+        assert memory_info.status.type == StatusType.PARTIAL
         assert memory_info.status.messages is not None

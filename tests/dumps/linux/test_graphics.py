@@ -4,7 +4,7 @@ import subprocess
 from unittest.mock import mock_open
 
 from pysysinfo.dumps.linux.graphics import fetch_graphics_info, get_pcie_gen, fetch_vram_amd
-from pysysinfo.models.status_models import FailedStatus, PartialStatus, SuccessStatus
+from pysysinfo.models.status_models import Status, StatusType
 
 
 class TestLinuxGraphics:
@@ -79,7 +79,7 @@ class TestLinuxGraphics:
 
         info = fetch_graphics_info()
 
-        assert isinstance(info.status, FailedStatus)
+        assert info.status.type == StatusType.FAILED
         assert "not found" in info.status.messages[0]
         assert len(info.modules) == 0
 
@@ -134,7 +134,7 @@ class TestLinuxGraphics:
 
         info = fetch_graphics_info()
 
-        assert isinstance(info.status, SuccessStatus)
+        assert info.status.type == StatusType.SUCCESS
         assert len(info.modules) == 2  # We mocked 2 devices, both use same file mocks so both appear as GPUs
 
         gpu = info.modules[0]
@@ -260,7 +260,7 @@ class TestLinuxGraphics:
 
         info = fetch_graphics_info()
 
-        assert isinstance(info.status, PartialStatus)
+        assert info.status.type == StatusType.PARTIAL
         assert len(info.modules) == 1
         gpu = info.modules[0]
         # Vendor ID should be None because it failed
@@ -288,7 +288,7 @@ class TestLinuxGraphics:
 
         # Should be skipped, so no modules found
         assert len(info.modules) == 0
-        assert isinstance(info.status, SuccessStatus)
+        assert info.status.type == StatusType.SUCCESS
 
     def test_fetch_graphics_info_amd_vram_failure(self, monkeypatch):
         monkeypatch.setattr(os.path, "exists", lambda x: True)
@@ -365,7 +365,7 @@ class TestLinuxGraphics:
         assert gpu.vendor_id == "0x10de"
         assert gpu.vram is None
         # Should have partial status due to vram failure
-        assert isinstance(info.status, PartialStatus)
+        assert info.status.type == StatusType.PARTIAL
         assert any("Could not get additional GPU info" in msg for msg in info.status.messages)
 
     def test_fetch_graphics_info_lspci_missing_fields(self, monkeypatch):
@@ -445,7 +445,7 @@ class TestLinuxGraphics:
         assert gpu.vendor_id == "0x8086"
         assert gpu.acpi_path is None
         # Should be partial status
-        assert isinstance(info.status, PartialStatus)
+        assert info.status.type == StatusType.PARTIAL
         assert any("ACPI path" in msg for msg in info.status.messages)
 
     def test_fetch_vram_amd_exception(self, monkeypatch):
@@ -489,5 +489,5 @@ class TestLinuxGraphics:
         assert len(info.modules) == 1
         gpu = info.modules[0]
         assert gpu.pci_path is None
-        assert isinstance(info.status, PartialStatus)
+        assert info.status.type == StatusType.PARTIAL
         assert any("PCI path" in msg for msg in info.status.messages)
