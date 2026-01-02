@@ -7,6 +7,8 @@ from pysysinfo.models.size_models import StorageSize
 
 
 class GPUInfo(BaseModel):
+    """Information for one GPU is stored here"""
+
     #: This is the GPU's name
     name: Optional[str] = None
 
@@ -50,5 +52,7 @@ class GPUInfo(BaseModel):
 
 
 class GraphicsInfo(ComponentInfo):
+    """Contains list of ``GPUInfo`` objects."""
+
     #: List of GPU modules present in the system.
     modules: List[GPUInfo] = Field(default_factory=list)
