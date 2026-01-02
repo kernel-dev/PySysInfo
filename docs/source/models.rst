@@ -1,57 +1,188 @@
+.. _models:
+
+------
 Models
-======
+------
 
 PySysInfo exposes Pydantic models for each hardware subsystem plus shared helpers for capacity units and discovery status.
 
-----------------
-Component Models
-----------------
 
-=============
+================
+Component Models
+================
+
+The Model for each component, such as CPU and GPU are subclasses of the ``ComponentInfo`` class.
+
+.. autoclass:: pysysinfo.models.component_model.ComponentInfo
+    :members:
+    :exclude-members: model_config
+
+
+All the following models include the ``status`` property, even though it is not shown
+explicitly.
+
+
 CPU
-=============
+===
+
+the information retrieved about the CPU is stored as the following class.
+
 .. autopydantic_model:: pysysinfo.models.cpu_models.CPUInfo
     :show-inheritance:
     :inherited-members: ComponentInfo
     :exclude-members: __init__
+    :model-show-field-summary: False
 
-=============
+---------
+
 GPU
-=============
+===
+
+Since there may be multiple GPUs present, the output for :meth:`fetch_graphics_info() <pysysinfo.models.info_models.HardwareManagerInterface.fetch_graphics_info>`
+is a ``GraphicsInfo`` object, with the ``modules`` property containing a list of ``GPUInfo`` objects.
+
+------
 
 .. autopydantic_model:: pysysinfo.models.gpu_models.GraphicsInfo
     :show-inheritance:
     :inherited-members: ComponentInfo
     :exclude-members: __init__
+    :model-show-field-summary: False
+
+--------
 
 .. autopydantic_model:: pysysinfo.models.gpu_models.GPUInfo
     :exclude-members: __init__
+    :model-show-field-summary: False
 
-- ``MemoryInfo``
-- ``MemoryModuleInfo``
-- ``MemoryModuleSlot``
-- ``StorageInfo``
-- ``DiskInfo``
+---------
 
--------------
+Memory
+======
+
+When :meth:`fetch_memory_info() <pysysinfo.models.info_models.HardwareManagerInterface.fetch_memory_info>` is queried,
+a :class:`MemoryInfo <pysysinfo.models.memory_models.MemoryInfo>` object is returned.
+
+Similar to GPUs, the details of all RAM devices are stored as a list of
+:class:`MemoryModuleInfo <pysysinfo.models.memory_models.MemoryModuleInfo>` objects,
+in the ``modules`` property.
+
+The RAM slot is stored in the ``slot`` property, as a
+:class:`MemoryModuleSlot <pysysinfo.models.memory_models.MemoryModuleSlot>` object.
+
+--------
+
+.. autopydantic_model:: pysysinfo.models.memory_models.MemoryInfo
+    :exclude-members: __init__
+    :model-show-field-summary: False
+
+--------
+
+.. autopydantic_model:: pysysinfo.models.memory_models.MemoryModuleInfo
+    :exclude-members: __init__
+    :model-show-field-summary: False
+
+--------
+
+.. autopydantic_model:: pysysinfo.models.memory_models.MemoryModuleSlot
+    :exclude-members: __init__
+    :model-show-field-summary: False
+
+--------
+
+Storage
+=======
+
+When :meth:`fetch_memory_info() <pysysinfo.models.info_models.HardwareManagerInterface.fetch_storage_info>`
+is queried, a :class:`StorageInfo <pysysinfo.models.storage_models.StorageInfo>` object is returned.
+
+Like GPU and RAM devices, Storage devices are stored as a list of
+:class:`DiskInfo <pysysinfo.models.storage_models.DiskInfo>` objects in the ``modules`` property.
+
+------
+
+.. autopydantic_model:: pysysinfo.models.storage_models.StorageInfo
+    :exclude-members: __init__
+    :model-show-field-summary: False
+
+------
+
+.. autopydantic_model:: pysysinfo.models.storage_models.DiskInfo
+    :exclude-members: __init__
+    :model-show-field-summary: False
+
+
+=============
 Status Models
--------------
+=============
+
+Every component's :class:`ComponentInfo <pysysinfo.models.component_model.ComponentInfo>` subclass has
+a :attr:`status <pysysinfo.models.component_model.ComponentInfo.status>` property,
+which contains information on the errors encountered while retrieving data.
+
+This property will be a subclass of :class:`StatusInfo <pysysinfo.models.status_models.StatusModel>`,
+which will be one of the following three.
+
+---------
 
 .. autopydantic_model:: pysysinfo.models.status_models.SuccessStatus
     :exclude-members: __init__
     :show-inheritance:
+    :model-show-field-summary: False
+
+---------
 
 .. autopydantic_model:: pysysinfo.models.status_models.PartialStatus
     :exclude-members: __init__
     :show-inheritance:
+    :model-show-field-summary: False
+
+---------
 
 .. autopydantic_model:: pysysinfo.models.status_models.FailedStatus
     :exclude-members: __init__
     :show-inheritance:
+    :model-show-field-summary: False
+
+---------
 
 .. autopydantic_model:: pysysinfo.models.status_models.StatusModel
     :exclude-members: __init__
+    :model-show-field-summary: False
 
----------------
-Capacity Models
----------------
+=============
+Size Models
+=============
+
+Capacities, such as the size of a RAM module, or the storage capacity of a Storage Disk,
+is expressed as one of the subclasses of the
+:class:`StorageSize <pysysinfo.models.size_models.StorageSize>` class.
+
+
+.. autopydantic_model:: pysysinfo.models.size_models.StorageSize
+    :exclude-members: __init__
+    :model-show-field-summary: False
+
+----------
+
+
+Every ``size`` parameter, that is of type ``StorageSize``, will of be one of the following classes.
+
+----------
+
+.. autopydantic_model:: pysysinfo.models.size_models.Kilobyte
+    :exclude-members: __init__
+    :model-show-field-summary: False
+
+----------
+
+.. autopydantic_model:: pysysinfo.models.size_models.Megabyte
+    :exclude-members: __init__
+    :model-show-field-summary: False
+
+----------
+
+.. autopydantic_model:: pysysinfo.models.size_models.Gigabyte
+    :exclude-members: __init__
+    :model-show-field-summary: False
+

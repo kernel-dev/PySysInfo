@@ -3,26 +3,39 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Home
-====
+---------
+PySysInfo
+---------
 
-PySysInfo gathers CPU, memory, storage, and graphics details across Linux, macOS, and Windows 
-into well-defined Pydantic models with a consistent structure. 
-The top-level `HardwareManager` picks the right platform manager at import time, so usage stays the same everywhere.
+PySysInfo is a Python library that gathers info about system components, such as the
+CPU, memory, storage, and graphics, across Linux, macOS, and Windows.
 
-Highlights
-----------
-- Cross-platform: sysfs on Linux, Registry/WMI on Windows, sysctl and IORegistry on macOS.
-- Unified data model: `HardwareInfo` bundles component models for easy serialization.
-- Pluggable managers: `LinuxHardwareManager`, `MacHardwareManager`, and `WindowsHardwareManager` expose the same API.
+========
+Features
+========
+
+- Consistent structure on all platforms, using `Pydantic models <https://docs.pydantic.dev/latest/concepts/models/>`_.
+- Usage stays the same everywhere, with no need for code changes across platforms.
+- Supports data retrieval as Class objects, Python dictionaries, or JSON-parsable strings.
+- For a list of supported hardware components, refer to :ref:`supported`.
+
+------
+
+To get started, refer to :ref:`quickstart`.
+
+-------
+
+========
+Contents
+========
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents
 
    quickstart
    hardware_managers
    querying_info
+   serialization
+   supported
    theory
-   classes
    models

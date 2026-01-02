@@ -1,13 +1,20 @@
+.. _hardware-managers:
+
 =================
 Hardware Managers
 =================
 
-Depending on the OS present, PySysInfo can automatically load one of the following Hardware Manager classes.
-All these classes implement the structure in :class:`pysysinfo.models.info_models.HardwareManagerInterface`.
+The first step to retrieving hardware information is to instantiate a ``HardwareManager``.
 
-------------
+Depending on the OS present, PySysInfo can automatically load the appropriate Hardware Manager class.
+The Hardware Manager classes implement the structure of :class:`HardwareManagerInterface <pysysinfo.models.info_models.HardwareManagerInterface>`.
 
-When the following code is run on a macOS machine, the output is as follows.
+
+--------------------------------
+Instantiating a Hardware Manager
+--------------------------------
+Instantiating a hardware manager is the same regardless of the OS.
+The following codeblock shows how a ``HardwareManager`` is instantiated.
 
 .. code-block:: python
 
@@ -27,14 +34,12 @@ Output:
     <class 'pysysinfo.dumps.mac.mac_dump.MacHardwareManager'>
     True
 
+The type of HardwareManager instantiated depends on the OS.
+On macOS, as we can see, the ``MacHardwareManager`` was instantiated.
+
 ------------
 
-The ``HardwareManager`` has the following methods:
-
-.. autoclass:: pysysinfo.models.info_models.HardwareManagerInterface
-    :members:
-
-Depending on your OS, one of the following classes will be instantiated:
+Depending on your OS, when ``HardwareManager()`` is called, one of the following classes will be instantiated:
 
 .. autoclass:: pysysinfo.dumps.windows.windows_dump.WindowsHardwareManager
     :exclude-members: __init__,__new__
@@ -47,6 +52,15 @@ Depending on your OS, one of the following classes will be instantiated:
 .. autoclass:: pysysinfo.dumps.linux.linux_dump.LinuxHardwareManager
     :exclude-members: __init__,__new__
     :noindex:
+
+------------
+
+All ``HardwareManager`` classes have the following property and methods:
+
+.. autoclass:: pysysinfo.models.info_models.HardwareManagerInterface
+    :members:
+    :noindex:
+
 
 ------------
 
@@ -77,5 +91,4 @@ The other methods in the
 :class:`HardwareManagerInterface <pysysinfo.models.info_models.HardwareManagerInterface>`
 class can be used to query each component.
 
-
-We explore ``HardwareInfo`` in the :ref:`querying-info` section.
+We explore this in the :ref:`querying-info` section.
