@@ -1,46 +1,45 @@
+import ctypes
 import json
 import subprocess
 from typing import List
 
-from pysysinfo.dumps.windows.interops.get_location_paths import get_location_paths
+from pysysinfo.interops.win.api.signatures import GetWmiInfo
+from pysysinfo.util.location_paths import get_location_paths
 from pysysinfo.models.network_models import NICInfo, NetworkInfo
 from pysysinfo.dumps.windows.common import format_acpi_path, format_pci_path
 from pysysinfo.models.status_models import Status, StatusType
 
+
 def fetch_wmi_cmdlet_network_info() -> NetworkInfo:
-    """
-    Fetch NICs using WMI (PhysicalAdapter=True) and then fetch
-    DEVPKEY_Device_LocationPaths for only those NICs in a batch.
-    """
-    command = (
-        'powershell -NoProfile -Command "Get-WmiObject -Class Win32_NetworkAdapter | '
-        'Where-Object { $_.PhysicalAdapter -eq $true } | '
-        'Select-Object PNPDeviceID, Manufacturer, Name | '
-        'ConvertTo-Csv -NoTypeInformation"'
+    network_info = NetworkInfo(status=Status(type=StatusType.SUCCESS))
+
+    raw_data = ctypes.create_string_buffer(1024 * 10)
+    GetWmiInfo(
+        b"SELECT PNPDeviceID, Manufacturer, Name FROM Win32_NetworkAdapter WHERE PhysicalAdapter=True",
+        b"ROOT\\CIMV2",
+        raw_data,
+        1024 * 10,
     )
 
     try:
-        result = subprocess.check_output(command, shell=True, text=True)
-    except Exception as e:
-        return NetworkInfo(status=Status(message=f"Powershell WMI cmdlet failed: {e}", type=StatusType.FAILED))
+        decoded = raw_data.value.decode("utf-8")
+    except Exception:
+        network_info.status.type = StatusType.FAILED
+        network_info.status.messages.append("Failed to decode WMI output")
+        return network_info
 
-    lines = [x.split(",") for x in result.strip().splitlines()]
-    lines = [[x.strip('"') for x in line] for line in lines]
+    for data in decoded.split("\n"):
+        if not data or "|" not in data:
+            continue
 
-    return parse_cmd_output(lines)
-
-
-def parse_cmd_output(lines: List[List[str]]) -> NetworkInfo:
-    header = lines[0]
-    pnp_dev_idx = header.index("PNPDeviceID")
-    manuf_idx = header.index("Manufacturer")
-    name_idx = header.index("Name")
-
-    network_info = NetworkInfo(status=Status(type=StatusType.SUCCESS))
-        
-    for data in lines[1:]:
         module = NICInfo()
-        pnp_device_id = data[pnp_dev_idx]
+        parsed = {
+            x.split("=", 1)[0]: x.split("=", 1)[1] for x in data.split("|") if "=" in x
+        }
+
+        pnp_device_id = parsed.get("PNPDeviceID", None)
+        manufacturer = parsed.get("Manufacturer", None)
+        name = parsed.get("Name", None)
 
         if "VEN_" in pnp_device_id and "DEV_" in pnp_device_id:
             module.vendor_id = pnp_device_id.split("VEN_")[1][:4]
@@ -50,13 +49,20 @@ def parse_cmd_output(lines: List[List[str]]) -> NetworkInfo:
             module.device_id = pnp_device_id.split("PID_")[1][:4]
 
         loc = get_location_paths(pnp_device_id)
-        pci, acpi = (loc + ["", ""])[:2]
 
-        module.pci_path = format_pci_path(pci)
-        module.acpi_path = format_acpi_path(acpi)
+        if loc is not None:
+            pci, acpi = (loc + ["", ""])[:2]
 
-        module.manufacturer = data[manuf_idx]
-        module.controller_model = data[name_idx]
+            module.pci_path = format_pci_path(pci)
+            module.acpi_path = format_acpi_path(acpi)
+        else:
+            network_info.status.type = StatusType.PARTIAL
+            network_info.status.messages.append(
+                f"Could not determine location paths for NIC with PNPDeviceID: {pnp_device_id}"
+            )
+
+        module.manufacturer = manufacturer
+        module.name = name
         network_info.modules.append(module)
 
     return network_info
