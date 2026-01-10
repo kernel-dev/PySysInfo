@@ -8,7 +8,7 @@ import winreg
 from typing import Optional
 
 from pysysinfo.dumps.windows.common import format_acpi_path, format_pci_path
-from pysysinfo.dumps.windows.interops.get_location_paths import fetch_device_properties
+from pysysinfo.util.location_paths import fetch_device_properties
 from pysysinfo.models.gpu_models import GPUInfo
 from pysysinfo.models.gpu_models import GraphicsInfo
 from pysysinfo.models.size_models import Megabyte
